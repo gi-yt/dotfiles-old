@@ -98,7 +98,7 @@
 #+end_src
 ** Open Config
 #+begin_src emacs-lisp
-(global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/emacs-config.org")))
+(global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/emacs-config.org")))
 #+end_src
 * Evil Mode and things related to it
 ** Evil
@@ -316,7 +316,7 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
   (use-package yasnippet :straight t)
   (use-package yasnippet-snippets :straight t)
   (yas-reload-all)
-  (yas-minor-mode 1)
+  (yas-global-mode 1)
 #+end_src
 ** LSP + Company
 #+begin_src emacs-lisp
@@ -358,16 +358,41 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
                       :hook (company-mode . company-box-mode))
               (use-package company-quickhelp :straight t)
             (company-quickhelp-mode 1)
-      (use-package python-mode
-        :straight t
-        :hook (python-mode . lsp-deferred))
+(use-package python-mode
+  :straight t
+  :hook (python-mode . lsp-deferred))
       (use-package pyvenv
       :straight t
         :config
         (pyvenv-mode 1))
     (use-package py-autopep8 :straight t :defer 0)
   (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
+(advice-add 'company-complete-common :before (lambda () (setq my-company-point (point))))
+(advice-add 'company-complete-common :after (lambda ()
+  		  				(when (equal my-company-point (point))
+  			  			  (yas-expand))))
 
+#+end_src
+** HTML/CSS/JS
+Install with npm install -g vscode-html-languageserver-bin vscode-css-languageserver-bin typescript typescript-language-server
+** Rust
+Install rust and then do 
+rustup component add rls rust-analysis rust-src
+** Bash
+Install with npm i -g bash-language-server
+** Grammarly
+install with npm i -g @emacs-grammarly/unofficial-grammarly-language-server
+** JSON
+Install with npm i -g vscode-json-languageserver
+** NixOS nix lang
+Install with nix-env -i rnix-lsp
+** Perl
+install with cpan Perl::LanguageServer
+** C/C++
+Install clangd from your distros package manager
+#+begin_src emacs-lisp
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
 #+end_src
 ** Auto Close bracket
 #+begin_src emacs-lisp
@@ -627,10 +652,8 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
   (define-key global-map (kbd "s-d") 'app-launcher-run-app)
 #+end_src
 
-* Arch Linux Package Management
+* General.el Keybindings
 #+begin_src emacs-lisp
-        (use-package arch-packer :straight t)
-      (setq arch-packer-default-command "yay")
     (use-package general :straight t
   :config
     (general-create-definer ak/leader-keys
@@ -638,11 +661,11 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
       :prefix "SPC"
       :global-prefix "C-SPC")
 
-    (ak/leader-keys
-     "p"  '(:ignore t :which-key "Manage Packages")
-     "pi" '(arch-packer-install-package :which-key "Get Package Info")
-     "ps" '(arch-packer-search-package :which-key "Search for a package")
-     "pl" '(arch-packer-list-packages :which-key "List all installed packages")))
+    ;; (ak/leader-keys
+    ;;  "p"  '(:ignore t :which-key "Manage Packages")
+    ;;  "pi" '(arch-packer-install-package :which-key "Get Package Info")
+    ;;  "ps" '(arch-packer-search-package :which-key "Search for a package")
+    ;;  "pl" '(arch-packer-list-packages :which-key "List all installed packages")))
 
 
 #+end_src
