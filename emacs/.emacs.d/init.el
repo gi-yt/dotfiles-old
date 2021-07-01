@@ -15,5 +15,5 @@
  )
 (org-babel-load-file
  (expand-file-name
-  "configuration.org"
+  "emacs-config.org"
   user-emacs-directory))
