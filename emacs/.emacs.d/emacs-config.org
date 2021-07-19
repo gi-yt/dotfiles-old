@@ -1,117 +1,103 @@
 #+title: Arya's GNU Emacs Configuration
 #+author: Arya Kiran
 * Basic stuff
-** Fonts
-   #+begin_src emacs-lisp
-(defvar efs/default-font-size 100)
-(defvar efs/default-variable-font-size 100)
-(defvar efs/frame-transparency '(90 . 90))
-
-(set-face-attribute 'default nil :font "Fira Code Retina" :height efs/default-font-size)
-
-;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height efs/default-font-size)
-
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular)
-
-
-   #+end_src
 ** Disabling annoyances present in emacs
    #+begin_src emacs-lisp
-   (scroll-bar-mode -1)        ; Disable visible scrollbar
-   (tool-bar-mode -1)          ; Disable the toolbar
-   (menu-bar-mode -1)          ; Disable the menu bar
-;; The blinking cursor is nothing, but an annoyance
-(blink-cursor-mode -1)
-
-;; Disable the annoying bell ring
-(setq ring-bell-function 'ignore)
-
-;; Nicer scrolling
-(setq scroll-margin 0
-      scroll-conservatively 100000
-      scroll-preserve-screen-position 1)
-
-;; mode line settings
-(line-number-mode t)
-(column-number-mode t)
-(size-indication-mode t)
-
-;; Disable auto vscroll (makes scrolling down a bit faster?)
-(setq auto-window-vscroll nil)
-
-;; Enable y/n answers
-(fset 'yes-or-no-p 'y-or-n-p)
-
-;; highlight the current line
-(global-hl-line-mode +1)
+     (scroll-bar-mode -1)        ; Disable visible scrollbar
+     (tool-bar-mode -1)          ; Disable the toolbar
+     (menu-bar-mode -1)          ; Disable the menu bar
+     (blink-cursor-mode -1)
+     (setq ring-bell-function 'ignore)
+     (setq scroll-margin 0
+           scroll-conservatively 100000
+           scroll-preserve-screen-position 1)
+     (line-number-mode t)
+     (column-number-mode t)
+     (size-indication-mode t) ; Displays the File Size in the modeline
+     (setq auto-window-vscroll nil)
+     (fset 'yes-or-no-p 'y-or-n-p)
+     (global-hl-line-mode +1)
 
    #+end_src
 ** Add melpa and org package repositories and installing use-package
 #+begin_src emacs-lisp
-    (defvar bootstrap-version)
-    (let ((bootstrap-file(expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))(bootstrap-version 5)) (unless (file-exists-p bootstrap-file)(with-current-buffer(url-retrieve-synchronously "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el" 'silent 'inhibit-cookies)(goto-char (point-max)) (eval-print-last-sexp)))(load bootstrap-file nil 'nomessage))
-  (straight-use-package 'use-package)
+  ;; Initialize package sources
+  (require 'package)
+
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
+
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+    ;; Initialize use-package on non-Linux platforms
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (setq package-native-compile t)
+  (require 'use-package)
+  (setq use-package-always-ensure t)
 #+end_src
 
+** Garbage Collection
+   #+begin_src emacs-lisp
+     (use-package gcmh :ensure t)
+(gcmh-mode 1)
+   #+end_src
 ** Disable Scratch buffer
 #+begin_src emacs-lisp
   (defun remove-scratch-buffer ()
     (if (get-buffer "*scratch*")
         (kill-buffer "*scratch*"))
-    (if (get-buffer "*straight-process*")
-        (kill-buffer "*straight-process*")))
-
+    (if (get-buffer "*ensure-process*")
+        (kill-buffer "*ensure-process*")))
   (add-hook 'after-change-major-mode-hook 'remove-scratch-buffer)
 #+end_src
 
 * Custom Keybindinds to make life easier
 ** ivy + counsel + swiper
-#+begin_src emacs-lisp
-    (use-package ivy
-    :straight t
-      :bind (("C-s" . swiper)
-             :map ivy-minibuffer-map
-             ("TAB" . ivy-alt-done)
-             ("C-l" . ivy-alt-done)
-             ("C-j" . ivy-next-line)
-             ("C-k" . ivy-previous-line)
-             :map ivy-switch-buffer-map
-             ("C-k" . ivy-previous-line)
-             ("C-l" . ivy-done)
-             ("C-d" . ivy-switch-buffer-kill)
-             :map ivy-reverse-i-search-map
-             ("C-k" . ivy-previous-line)
-             ("C-d" . ivy-reverse-i-search-kill))
-      :config
-      (ivy-mode 1))
-    (use-package counsel :straight t)
-  (use-package all-the-icons-ivy
-  :straight t
-    :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup))
-#+end_src
+   #+begin_src emacs-lisp
+       (use-package ivy
+       :ensure t
+         :bind (("C-s" . swiper)
+                :map ivy-minibuffer-map
+                ("TAB" . ivy-alt-done)
+                ("M-TAB" . ivy-immediate-done)
+                ("C-l" . ivy-alt-done)
+                ("C-j" . ivy-next-line)
+                ("C-k" . ivy-previous-line)
+                :map ivy-switch-buffer-map
+                ("C-k" . ivy-previous-line)
+                ("C-l" . ivy-done)
+                ("C-d" . ivy-switch-buffer-kill)
+                :map ivy-reverse-i-search-map
+                ("C-k" . ivy-previous-line)
+                ("C-d" . ivy-reverse-i-search-kill))
+         :config
+         (ivy-mode 1))
+     (use-package all-the-icons-ivy
+     :ensure t
+       :init (add-hook 'after-init-hook 'all-the-icons-ivy-setup))
+  (use-package ivy-rich
+  :ensure t
+    :after ivy
+    :init
+    (ivy-rich-mode 1))
+
+  (use-package counsel
+  :ensure t
+    :bind (("M-x" . counsel-M-x)
+("<menu>" . counsel-M-x)
+           ("C-x b" . counsel-switch-buffer)
+           ("C-x C-f" . counsel-find-file)))
+   #+end_src
 ** Hotkey based config reload
 #+begin_src emacs-lisp
 (global-set-key (kbd "M-r") 'reload-config)
 (defun reload-config ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
-#+end_src
-** Better completion for commands like M-x
-#+begin_src emacs-lisp
-    (use-package ivy-rich
-    :straight t
-      :after ivy
-      :init
-      (ivy-rich-mode 1))
-
-    (use-package counsel
-    :straight t
-      :bind (("M-x" . counsel-M-x)
-  ("<menu>" . counsel-M-x)
-             ("C-x b" . counsel-switch-buffer)
-             ("C-x C-f" . counsel-find-file)))
 #+end_src
 ** Zooming in and out
 #+begin_src emacs-lisp
@@ -134,19 +120,14 @@
                     eshell-mode
                     git-rebase-mode
                     erc-mode
-                    circe-server-mode
-                    circe-chat-mode
-                    circe-query-mode
-                    sauron-mode
                     term-mode))
     (add-to-list 'evil-emacs-state-modes mode)))
-
   (use-package undo-tree
-  :straight t
+  :ensure t
   :init
   (global-undo-tree-mode 1))
   (use-package evil
-  :straight t
+  :ensure t
     :init
     (setq evil-want-integration t)
     (setq evil-want-keybinding nil)
@@ -159,19 +140,11 @@
     (evil-mode 1)
     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
     (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-
-    ;; Use visual line motions even outside of visual-line-mode buffers
     (evil-global-set-key 'motion "j" 'evil-next-visual-line)
     (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-
-      ;; Disable arrow keys in normal and visual modes
-
     (evil-set-initial-state 'messages-buffer-mode 'normal)
     (evil-set-initial-state 'dashboard-mode 'normal))
-
-  (use-package evil-collection
-  :straight t
-    :after evil
+  (use-package evil-collection :ensure t :after evil
     :init
     (setq evil-collection-company-use-tng nil)  ;; Is this a bug in evil-collection?
     :custom
@@ -198,11 +171,10 @@
 #+end_src
 ** UI Improvements
 #+begin_src emacs-lisp
-    (org-indent-mode 1)
-    (setq org-ellipsis " ▾")
-
+  (org-indent-mode 1)
+  (setq org-ellipsis " ▾")
   (use-package org-bullets
-  :straight t
+  :ensure t
     :after org
     :hook (org-mode . org-bullets-mode))
 #+end_src
@@ -212,24 +184,36 @@
  'org-babel-load-languages
  '((emacs-lisp . nil)
    (python . t)))
-
+(require 'ox-man)
 #+end_src
+** TOC
+   #+begin_src emacs-lisp
+(use-package toc-org :ensure t
+  :commands toc-org-enable
+  :init (add-hook 'org-mode-hook 'toc-org-enable))
+   #+end_src
 * QOF improvements
 ** 0x0.st
    #+begin_src emacs-lisp
-     (use-package 0x0
-       :straight t
-       :defer 0)
+     (use-package 0x0 :ensure t :defer 0)
    #+end_src
 ** Which Key
 #+begin_src emacs-lisp
-    (use-package which-key
-      :straight t
-      :defer 0
-      :diminish which-key-mode
-      :config
-  (which-key-mode)
-      (setq which-key-idle-delay 0))
+(use-package which-key :ensure t
+  :init
+  (setq which-key-side-window-location 'bottom
+        which-key-sort-order #'which-key-key-order-alpha
+        which-key-sort-uppercase-first nil
+        which-key-add-column-padding 1
+        which-key-max-display-columns nil
+        which-key-min-display-lines 6
+        which-key-side-window-slot -10
+        which-key-side-window-max-height 0.25
+        which-key-idle-delay 0.8
+        which-key-max-description-length 25
+        which-key-allow-imprecise-window-fit t
+        which-key-separator " → " ))
+(which-key-mode)
 #+end_src
 ** Make <ESC> quit prompts like C-g
 #+begin_src emacs-lisp
@@ -244,7 +228,7 @@
    #+end_src
 ** Keycast mode
 #+begin_src emacs-lisp
-        (use-package keycast :straight t)
+        (use-package keycast :ensure t)
       (with-eval-after-load 'keycast
         (define-minor-mode keycast-mode
           "Show current command and its key binding in the mode line."
@@ -259,7 +243,7 @@
 ** Rainbow Parenthesis
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-  :straight t
+  :ensure t
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 ** Highlight current line
@@ -268,14 +252,12 @@
 #+end_src
 ** Colour Stuff
 #+begin_src emacs-lisp
-  (use-package rainbow-mode
-    :straight t)
+  (use-package rainbow-mode :ensure t)
 (rainbow-mode 1)
 #+end_src
 ** No littering
    #+begin_src emacs-lisp
-   (use-package no-littering :straight t
-  :demand t
+   (use-package no-littering :ensure t :demand t
   :config
   ;; /etc is version controlled and I want to store mc-lists in git
   (setq mc/list-file (no-littering-expand-etc-file-name "mc-list.el"))
@@ -287,79 +269,63 @@
    #+end_src
 ** Remember your location in a file
 #+begin_src emacs-lisp
-(use-package saveplace :straight t
+(use-package saveplace :ensure t
   :unless noninteractive
   :config (save-place-mode))
 
 #+end_src
 ** Generic Syntax highlighting
 #+begin_src emacs-lisp
-(use-package generic-x
-  :if (daemonp)
-  :defer 30)
+(require 'generic-x)
 
 #+end_src
 ** Buttonize URLs
 #+begin_src emacs-lisp
-(use-package goto-addr :straight t
+(use-package goto-addr :ensure t
   :hook ((compilation-mode prog-mode eshell-mode shell-mode) . goto-address-mode)
   :bind (:map goto-address-highlight-keymap
          ("<RET>" . goto-address-at-point)
          ("M-<RET>" . newline)))
 
 #+end_src
-** Visual feedback
-#+begin_src emacs-lisp
-(use-package goggles :straight t
-  :defer 10
-  :config (goggles-mode))
-
-#+end_src
 ** Display a list of keybindings for the current major mode
 #+begin_src emacs-lisp
-(use-package discover-my-major :straight t
-  :bind (("C-h C-m" . discover-my-major)))
+(use-package discover-my-major :ensure t :bind (("C-h C-m" . discover-my-major)))
 #+end_src
 * Making Emacs look nice
 ** Modeline
 *** Getting Doom Emacs's modeline
     #+begin_src emacs-lisp
-      (use-package all-the-icons :straight t)
-      (use-package doom-modeline
-        :straight t )
+      (use-package all-the-icons :ensure t)
+      (use-package doom-modeline :ensure t )
 (doom-modeline-mode 1)
     #+end_src
 *** Extra Widgets on Modeline
     #+begin_src emacs-lisp
-(require 'display-line-numbers)
-
-(defcustom display-line-numbers-exempt-modes
-  '(vterm-mode eshell-mode shell-mode term-mode ansi-term-mode)
-  "Major modes on which to disable line numbers."
-  :group 'display-line-numbers
-  :type 'list
-  :version "green")
-
-(defun display-line-numbers--turn-on ()
-  "Turn on line numbers except for certain major modes.
-Exempt major modes are defined in `display-line-numbers-exempt-modes'."
-  (unless (or (minibufferp)
-              (member major-mode display-line-numbers-exempt-modes))
-    (display-line-numbers-mode)))
-
-(global-display-line-numbers-mode)
+      (require 'display-line-numbers)
+      (defcustom display-line-numbers-exempt-modes
+        '(vterm-mode eshell-mode shell-mode term-mode ansi-term-mode)
+        "Major modes on which to disable line numbers."
+        :group 'display-line-numbers
+        :type 'list
+        :version "green")
+      (defun display-line-numbers--turn-on ()
+        "Turn on line numbers except for certain major modes.
+      Exempt major modes are defined in `display-line-numbers-exempt-modes'."
+        (unless (or (minibufferp)
+                    (member major-mode display-line-numbers-exempt-modes))
+          (display-line-numbers-mode)))
+      (global-display-line-numbers-mode)
+(global-visual-line-mode t)
     #+end_src
 ** Theme
    #+begin_src emacs-lisp
-          (use-package doom-themes
-       :straight t
-            :init (load-theme 'doom-one))
+          (use-package doom-themes :ensure t :init (load-theme 'doom-one))
 
    #+end_src
 ** Start screen
 #+begin_src emacs-lisp
-  (use-package dashboard
-  :straight t
+  (use-package dashboard :ensure t
     :init      ;; tweak dashboard config before loading it
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
@@ -372,122 +338,189 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
     (dashboard-setup-startup-hook)
     (dashboard-modify-heading-icons '((recents . "file-text")
                     (bookmarks . "book"))))
+(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 #+end_src
 * Git via Magit
 #+begin_src emacs-lisp
-  (use-package magit
-    :straight t
-    :defer 0
-    :commands magit-status
-    :custom
-    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+  (use-package magit :ensure t :defer 0 :commands magit-status :custom  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
          #+end_src
 
 * Programming
 ** Yasnippet
 #+begin_src emacs-lisp
-  (use-package yasnippet :straight t)
-  (use-package yasnippet-snippets :straight t)
-  (yas-reload-all)
+  (use-package yasnippet :ensure t)
+  (use-package yasnippet-snippets :ensure t)
   (yas-global-mode 1)
 #+end_src
 ** LSP + Company
 #+begin_src emacs-lisp
-            (defun efs/lsp-mode-setup ()
-              (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-              (lsp-headerline-breadcrumb-mode))
+          (defun efs/lsp-mode-setup ()
+        (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+        (lsp-headerline-breadcrumb-mode))
 
-            (use-package lsp-mode
-            :straight t
-              :commands (lsp lsp-deferred)
-              :hook (lsp-mode . efs/lsp-mode-setup)
-              :init
-              (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-              :config
-              (lsp-enable-which-key-integration t))
-            (use-package lsp-ui :after lsp-mode
-            :straight t
-              :hook (lsp-mode . lsp-ui-mode)
-              :custom
-              (lsp-ui-doc-position 'bottom))
-          (use-package lsp-treemacs :after (lsp-mode lsp-ui)
-          :straight t
-            :after lsp)
-        (use-package lsp-ivy :straight t :after (ivy lsp-mode))
-  (use-package company
-                    :straight t
-                      :after lsp-mode
-                      :hook (lsp-mode . company-mode)
-                      :bind (:map company-active-map
-                             ("<tab>" . company-complete-selection))
-                            (:map lsp-mode-map
-                             ("<tab>" . company-indent-or-complete-common))
-                      :custom
-                      (company-minimum-prefix-length 1)
-                      (company-idle-delay 0.0))
-
-                    (use-package company-box
-                    :straight t
-                      :hook (company-mode . company-box-mode))
-              (use-package company-quickhelp :straight t)
-            (company-quickhelp-mode 1)
-(use-package python-mode
-  :straight t
-  :hook (python-mode . lsp-deferred))
-      (use-package pyvenv
-      :straight t
+          (use-package lsp-mode
+          :ensure t
+        :after (company company-box)
+        :commands (lsp lsp-deferred)
+        :hook (lsp-mode . efs/lsp-mode-setup)
+        :init
+        (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
         :config
-        (pyvenv-mode 1))
-    (use-package py-autopep8 :straight t :defer 0)
-  (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
-  (use-package company-shell :straight t
-  :hook ((sh-mode shell-mode) . sh-mode-init)
-  :config
-  (defun sh-mode-init ()
-    (setq-local company-backends '((company-shell
-                                    company-shell-env
-                                    company-files
-                                    company-dabbrev-code
-                                    company-capf
-                                    company-yasnippet)))))
+        ((let* (args)
+           )sp-enable-which-key-integration t))
+          (use-package lsp-ui :after lsp-mode
+          :ensure t
+        :hook (lsp-mode . lsp-ui-mode)
+        :custom
+        (lsp-ui-doc-position 'bottom))
+        (use-package lsp-treemacs :after (lsp-mode lsp-ui)
+        :ensure t
+          :after lsp)
+      (use-package lsp-ivy :ensure t :after (ivy lsp-mode))
+    (use-package company
+              :ensure t
+        :after (lsp-mode)
+            :hook (lsp-mode . company-mode)
+            :bind (:map company-active-map
+                   ("<tab>" . company-complete-selection))
+            (:map lsp-mode-map
+                  ("<tab>" . company-indent-or-complete-common))
+
+            :custom
+            (company-minimum-prefix-length 1)
+            (company-idle-delay 0.0))
+
+              (use-package company-box
+              :ensure t
+            :hook (company-mode . company-box-mode))
+        (use-package company-quickhelp :ensure t)
+          (company-quickhelp-mode 1)
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred))
+    (use-package pyvenv
+    :ensure t
+      :config
+      (pyvenv-mode 1))
+      (use-package py-autopep8 :ensure t :defer 0)
+    (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
+    (use-package company-shell :ensure t
+    :hook ((sh-mode shell-mode) . sh-mode-init)
+    :config
+    (defun sh-mode-init ()
+      (setq-local company-backends '((company-shell
+                      company-shell-env
+                      company-files
+                      company-dabbrev-code
+                      company-capf
+                      company-yasnippet)))))
 
 #+end_src
+** LISP
+   #+begin_src emacs-lisp
+          (use-package lispy
+            :hook ((emacs-lisp-mode . lispy-mode)
+                   (scheme-mode . lispy-mode)))
+
+          ;; (use-package evil-lispy
+          ;;   :hook ((lispy-mode . evil-lispy-mode)))
+
+          (use-package lispyville
+            :hook ((lispy-mode . lispyville-mode))
+            :config
+            (lispyville-set-key-theme '(operators c-w additional
+                                        additional-movement slurp/barf-cp
+                                        prettify)))
+     (use-package sly
+       :mode "\\.lisp\\'")
+
+     (use-package slime
+       :mode "\\.lisp\\'")
+   #+end_src
 ** HTML/CSS/JS
-Install with npm install -g vscode-html-languageserver-bin vscode-css-languageserver-bin typescript typescript-language-server
+Install with
+npm install -g vscode-html-languageserver-bin vscode-css-languageserver-bin typescript typescript-language-server
+#+begin_src emacs-lisp
+(use-package web-mode
+  :mode "(\\.\\(html?\\|ejs\\|tsx\\|jsx\\)\\'"
+  :config
+  (setq-default web-mode-code-indent-offset 2)
+  (setq-default web-mode-markup-indent-offset 2)
+  (setq-default web-mode-attribute-indent-offset 2))
+
+;; 1. Start the server with `httpd-start'
+;; 2. Use `impatient-mode' on any buffer
+(use-package impatient-mode)
+
+(use-package skewer-mode)
+#+end_src
 ** Rust
 Install rust and then do 
 rustup component add rls rust-analysis rust-src
-** Bash
-Install with npm i -g bash-language-server
-** Grammarly
-install with npm i -g @emacs-grammarly/unofficial-grammarly-language-server
-** JSON
-Install with npm i -g vscode-json-languageserver
-** NixOS nix lang
-Install with nix-env -i rnix-lsp
-** Perl
-install with cpan Perl::LanguageServer
-** C/C++
-Install clangd from your distros package manager
 #+begin_src emacs-lisp
-(add-hook 'c-mode-hook 'lsp)
-(add-hook 'c++-mode-hook 'lsp)
+  (use-package rust-mode
+    :mode "\\.rs\\'"
+    :init (setq rust-format-on-save t))
+
+  (use-package cargo
+    :ensure t
+    :defer t)
+#+end_src
+** Bash
+Install with
+npm i -g bash-language-server
+** JSON
+Install with
+npm i -g vscode-json-languageserver
+** C/C++
+Install clangd or clang-utils from your distros package manager
+#+begin_src emacs-lisp
+  (add-hook 'c-mode-hook 'lsp)
+  (add-hook 'c++-mode-hook 'lsp)
+(use-package compile
+  :custom
+  (compilation-scroll-output t))
+
+(defun auto-recompile-buffer ()
+  (interactive)
+  (if (member #'recompile after-save-hook)
+      (remove-hook 'after-save-hook #'recompile t)
+    (add-hook 'after-save-hook #'recompile nil t)))
+
+#+end_src
+** MarkDown
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode "\\.md\\'"
+  :config
+  (setq markdown-command "marked")
+  (defun dw/set-markdown-header-font-sizes ()
+    (dolist (face '((markdown-header-face-1 . 1.2)
+                    (markdown-header-face-2 . 1.1)
+                    (markdown-header-face-3 . 1.0)
+                    (markdown-header-face-4 . 1.0)
+                    (markdown-header-face-5 . 1.0)))
+      (set-face-attribute (car face) nil :weight 'normal :height (cdr face))))
+
+  (defun dw/markdown-mode-hook ()
+    (dw/set-markdown-header-font-sizes))
+
+  (add-hook 'markdown-mode-hook 'dw/markdown-mode-hook))
 #+end_src
 ** Auto Close bracket
 #+begin_src emacs-lisp
-  (use-package smartparens :straight t)
+  (use-package smartparens :ensure t)
 (smartparens-global-mode 1)
 #+end_src
 ** FlyCheck
 #+begin_src emacs-lisp
-  (use-package flycheck
-    :straight t)
+  (use-package flycheck :ensure t)
 (global-flycheck-mode t)
 #+end_src
 ** Highlight indentations
 #+begin_src emacs-lisp
-;; highlight indentations in python
-(use-package highlight-indent-guides :straight t
+(use-package highlight-indent-guides :ensure t
   :hook ((python-mode sass-mode yaml-mode nim-mode) . highlight-indent-guides-mode)
   :config
   ;; Don't highlight first level (that would be a line at column 1)
@@ -508,8 +541,7 @@ Install clangd from your distros package manager
 #+end_src
 ** Agressive indent
 #+begin_src emacs-lisp
-(use-package aggressive-indent :straight t
-  :hook ((emacs-lisp-mode lisp-mode hy-mode clojure-mode css js-mode) . aggressive-indent-mode)
+(use-package aggressive-indent :ensure t
   :config
   ;; Normally this functions from `indent.el' always displays an
   ;; annoying "reporter" message that it's indenting the current region.
@@ -523,11 +555,11 @@ Install clangd from your distros package manager
             (indent-according-to-mode))
         (forward-line 1))
       (move-marker end nil))))
-
+(global-aggressive-indent-mode t)
 #+end_src
 ** Multiple cursors
 #+begin_src emacs-lisp
-(use-package multiple-cursors :straight t
+(use-package multiple-cursors :ensure t
   :bind (("C-c m" . mc/mark-all-dwim)
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
@@ -549,98 +581,99 @@ Install clangd from your distros package manager
 #+end_src
 * VTerm
 #+begin_src emacs-lisp
-        (use-package vterm
-        :straight t
-          :commands vterm
-          :config
-          (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  ;; Set this to match your custom shell prompt
-          (setq vterm-shell "bash")                       ;; Set this to customize the shell to launch
-          (setq vterm-max-scrollback 10000))
-      (global-set-key (kbd "<s-return>") 'vterm)
-    (defalias 'yes-or-no-p 'y-or-n-p)
+        (use-package vterm :ensure t :commands vterm :config (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  (setq vterm-shell "bash") (setq vterm-max-scrollback 10000))
+  (global-set-key (kbd "<s-return>") 'vterm)
   (setq vterm-kill-buffer-on-exit t)
+(use-package multi-vterm :ensure t
+	:config
+	(add-hook 'vterm-mode-hook
+			(lambda ()
+			(setq-local evil-insert-state-cursor 'box)
+			(evil-insert-state)))
+	(define-key vterm-mode-map [return]                      #'vterm-send-return)
+
+	(setq vterm-keymap-exceptions nil)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-f")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-a")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-v")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-b")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-w")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-u")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-n")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-m")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-p")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-j")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-k")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-r")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
+	(evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+	(evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+	(evil-define-key 'normal vterm-mode-map (kbd ",c")       #'multi-vterm)
+	(evil-define-key 'normal vterm-mode-map (kbd ",n")       #'multi-vterm-next)
+	(evil-define-key 'normal vterm-mode-map (kbd ",p")       #'multi-vterm-prev)
+	(evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
+	(evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
+	(evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
 #+end_src
 
 * PDF
 #+begin_src emacs-lisp
   (use-package pdf-tools 
-    :straight t)
+    :ensure t)
   (pdf-tools-install)
   (setq pdf-annot-activate-created-annotations t)
-  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  (define-key pdf-view-mode-map (kbd "C-f") 'isearch-forward)
 #+end_src
 * Dired
 #+begin_src emacs-lisp
-      (use-package dired
+      (use-package dired :ensure nil
         :commands (dired dired-jump)
         :bind (("C-x C-j" . dired-jump))
-        :custom ((dired-listing-switches "-agho --group-directories-first"))
-        :config
-        (evil-collection-define-key 'normal 'dired-mode-map
-          "h" 'dired-single-up-directory
-          "l" 'dired-single-buffer))
+        :custom ((dired-listing-switches "-agho --group-directories-first")))
+
+(use-package all-the-icons-dired :ensure t)
+(use-package dired-open :ensure t)
+(use-package peep-dired :ensure t)
 
 
-      (use-package all-the-icons-dired :after dired
-      :straight t
-        :hook (dired-mode . all-the-icons-dired-mode))
+(with-eval-after-load 'dired
+  (define-key dired-mode-map (kbd "M-p") 'peep-dired)
+  (evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
+  (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
+  (evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
+  (evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file))
 
-      (use-package dired-open
-      :straight t
-  :commands (dired dired-jump)
-        :config
-        ;; Doesn't work as expected!
-        ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
-        (setq dired-open-extensions '(("mkv" . "mpv"))))
+(add-hook 'peep-dired-hook 'evil-normalize-keymaps)
+;; Get file icons in dired
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+;; With dired-open plugin, you can launch external programs for certain extensions
+;; For example, I set all .png files to open in 'sxiv' and all .mp4 files to open in 'mpv'
+(setq dired-open-extensions '(("gif" . "sxiv")
+                              ("jpg" . "sxiv")
+                              ("png" . "sxiv")
+                              ("mkv" . "mpv")
+                              ("mp4" . "mpv")))
 
       (use-package dired-hide-dotfiles
-      :straight t
+      :ensure t
         :hook (dired-mode . dired-hide-dotfiles-mode)
         :config
         (evil-collection-define-key 'normal 'dired-mode-map
           "H" 'dired-hide-dotfiles-mode))
 #+end_src
 
-* Emacs startup time
-#+begin_src emacs-lisp
-;; The default is 800 kilobytes.  Measured in bytes.
-(setq gc-cons-threshold (* 50 1000 1000))
-
-;; Profile emacs startup
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (message "*** Emacs loaded in %s with %d garbage collections."
-                     (format "%.2f seconds"
-                             (float-time
-                              (time-subtract after-init-time before-init-time)))
-                     gcs-done)))
-#+end_src
-* EXWM
-#+begin_src emacs-lisp
-    ;;(use-package exwm)
-    ;;(require 'exwm-config)
-    ;;(exwm-config-example)
-  ;;(add-hook 'exwm-manage-finish-hook
-            ;;(lambda ()
-              ;;(when (and exwm-class-name
-                ;;         (string= exwm-class-name "Chromium"))
-                ;;(exwm-input-set-local-simulation-keys nil))))
-;;(require 'exwm-systemtray)
-;;(exwm-systemtray-enable)
-
-#+end_src
-
 * Asynchronus processes
 #+begin_src emacs-lisp
-(use-package async
-  :straight t
-  :init (dired-async-mode 1))
+(use-package async :ensure t) 
 #+end_src
-
 * Tabs
 #+begin_src emacs-lisp
     (use-package centaur-tabs
-    :straight t
+    :ensure t
     :config
     (setq centaur-tabs-style "bar"
            centaur-tabs-height 32
@@ -709,7 +742,7 @@ Install clangd from your distros package manager
     (:map evil-normal-state-map
            ("g t" . centaur-tabs-forward)
            ("g T" . centaur-tabs-backward)))
-
+(centaur-tabs-mode)
   #+end_src
 
 * Unicode Support
@@ -725,7 +758,7 @@ Install clangd from your distros package manager
             `(,updated-block))))
 
   (use-package unicode-fonts
-    :straight t
+    :ensure t
     :custom
     (unicode-fonts-skip-font-groups '(low-quality-glyphs))
     :config
@@ -745,22 +778,23 @@ Install clangd from your distros package manager
 * Emoji
 #+begin_src emacs-lisp
   (use-package emojify
-  :straight t
+  :ensure t
     :hook (erc-mode . emojify-mode)
     :commands emojify-mode)
 #+end_src
 * Notifications
 #+begin_src emacs-lisp
   (use-package alert
-  :straight t
+  :ensure t
     :commands alert
     :config
     (setq alert-default-style 'notifications))
+(global-emojify-mode t)
 #+end_src
 * Auto Save
 #+begin_src emacs-lisp
   (use-package super-save
-  :straight t
+  :ensure t
     :diminish super-save-mode
     :config
     (super-save-mode +1)
@@ -771,7 +805,7 @@ Install clangd from your distros package manager
 #+begin_src emacs-lisp
 
   (use-package evil-nerd-commenter
-  :straight t
+  :ensure t
     :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
 
@@ -779,38 +813,13 @@ Install clangd from your distros package manager
 
 * Telegram
 #+begin_src emacs-lisp
-  (use-package telega
-    :straight t)
-  (define-key global-map (kbd "C-c t") telega-prefix-map)
-  (setq telega-completing-read-function 'ivy-completing-read)
-  (setq telega-emoji-company-backend 'telega-company-emoji)
+  (use-package telega :ensure t)
+(setq telega-use-docker t)
+    (define-key global-map (kbd "C-c t") telega-prefix-map)
+    (setq telega-completing-read-function 'ivy-completing-read)
+    (setq telega-emoji-company-backend 'telega-company-emoji)
 #+end_src
 
-* App Launcher
-#+begin_src emacs-lisp
-  (use-package app-launcher
-    :straight '(app-launcher :host github :repo "SebastienWae/app-launcher"))
-
-  (define-key global-map (kbd "s-d") 'app-launcher-run-app)
-#+end_src
-
-* General.el Keybindings
-#+begin_src emacs-lisp
-    (use-package general :straight t
-  :config
-    (general-create-definer ak/leader-keys
-      :keymaps '(normal insert visual emacs)
-      :prefix "SPC"
-      :global-prefix "C-SPC")
-
-    ;; (ak/leader-keys
-    ;;  "p"  '(:ignore t :which-key "Manage Packages")
-    ;;  "pi" '(arch-packer-install-package :which-key "Get Package Info")
-    ;;  "ps" '(arch-packer-search-package :which-key "Search for a package")
-    ;;  "pl" '(arch-packer-list-packages :which-key "List all installed packages")))
-
-
-#+end_src
 * AutoSave
 #+begin_src emacs-lisp
 (setq auto-save-list-file-prefix "~/.config/emacs/autosave/")
@@ -820,13 +829,13 @@ Install clangd from your distros package manager
 #+end_src
 * Undo Session persist
 #+begin_src emacs-lisp
-(use-package undo-fu-session :straight t)
+(use-package undo-fu-session :ensure t)
   (global-undo-fu-session-mode)
 #+end_src
 * PDF Restore
 #+begin_src emacs-lisp
   (use-package pdf-view-restore
-  :straight t
+  :ensure t
     :after pdf-tools
     (add-hook 'pdf-view-mode-hook 'pdf-view-restore-mode))
   (setq pdf-view-restore-filename "~/.emacs.d/.pdf-view-restore")
@@ -854,71 +863,71 @@ Install clangd from your distros package manager
 * Better C-x o
 #+begin_src emacs-lisp
   (windmove-default-keybindings)
-  (global-set-key (kbd "M-<left>")  'windmove-left)
-  (global-set-key (kbd "M-<right>") 'windmove-right)
-  (global-set-key (kbd "M-<up>")    'windmove-up)
-  (global-set-key (kbd "M-<down>")  'windmove-down)
 #+end_src
 * Hide ModeLine
 #+begin_src emacs-lisp
-  (use-package hide-mode-line :straight t :hook (vterm-mode . hide-mode-line-mode)(dashboard-mode . hide-mode-line-mode))
+  (use-package hide-mode-line :ensure t :hook (vterm-mode . hide-mode-line-mode)(dashboard-mode . hide-mode-line-mode))
 #+end_src
 
 * M-x History
   #+begin_src emacs-lisp
-(straight-use-package 'smex)
+(use-package smex)
   #+end_src
 
 * Org Preview
   #+begin_src emacs-lisp
-    (use-package org-preview-html :straight t)
-(use-package html-preview
-  :straight '(html-preview :host github :repo "punchagan/html-preview"))
+    (use-package org-preview-html :ensure t)
+;; (use-package html-preview
+  ;; :ensure '(html-preview :host github :repo "punchagan/html-preview"))
   #+end_src
 * MU4E
 ** base
   #+begin_src emacs-lisp
-(use-package mu4e
-  :ensure nil
-  ;; :load-path "/usr/share/emacs/site-lisp/mu4e/"
-  ;; :defer 20 ; Wait until 20 seconds after startup
-  :config
+            (use-package mu4e :ensure nil)
+                      (setq mu4e-change-filenames-when-moving t)
 
-  ;; This is set to 't' to avoid mail syncing issues when using mbsync
-  (setq mu4e-change-filenames-when-moving t)
+                      ;; Refresh mail using isync every 10 minutes
+                      (setq mu4e-update-interval (* 10 60))
+                      (setq mu4e-maildir "~/Mail")
+         ;; Make sure plain text mails flow correctly for recipients
+          (setq mu4e-compose-format-flowed t)
+     ;; Configure the function to use for sending mail
+      (setq message-send-mail-function 'smtpmail-send-it)
+                      (setq mu4e-drafts-folder "/[Gmail]/Drafts")
+                      (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
+                      (setq mu4e-refile-folder "/[Gmail]/All Mail")
+                      (setq mu4e-trash-folder  "/[Gmail]/Trash")
 
-  ;; Refresh mail using isync every 10 minutes
-  (setq mu4e-update-interval (* 10 60))
-  (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/Mail")
+                      (setq mu4e-maildir-shortcuts
+                          '(("/Inbox"             . ?i)
+                            ("/[Gmail]/Sent Mail" . ?s)
+                            ("/[Gmail]/Trash"     . ?t)
+                            ("/[Gmail]/Drafts"    . ?d)
+                            ("/[Gmail]/All Mail"  . ?a)))
+(setq mu4e-completing-read-function 'ivy-completing-read)
 
-  (setq mu4e-drafts-folder "/[Gmail]/Drafts")
-  (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
-  (setq mu4e-refile-folder "/[Gmail]/All Mail")
-  (setq mu4e-trash-folder  "/[Gmail]/Trash")
-
-  (setq mu4e-maildir-shortcuts
-      '(("/Inbox"             . ?i)
-        ("/[Gmail]/Sent Mail" . ?s)
-        ("/[Gmail]/Trash"     . ?t)
-        ("/[Gmail]/Drafts"    . ?d)
-        ("/[Gmail]/All Mail"  . ?a))))
-
-
-(setq mu4e-maildir-shortcuts
-    '((:maildir "/Inbox"    :key ?i)
-      (:maildir "/[Gmail]/Sent Mail" :key ?s)
-      (:maildir "/[Gmail]/Trash"     :key ?t)
-      (:maildir "/[Gmail]/Drafts"    :key ?d)
-      (:maildir "/[Gmail]/All Mail"  :key ?a)))
-
-
+                    (setq mu4e-maildir-shortcuts
+                        '((:maildir "/Inbox"    :key ?i)
+                          (:maildir "/[Gmail]/Sent Mail" :key ?s)
+                          (:maildir "/[Gmail]/Trash"     :key ?t)
+                          (:maildir "/[Gmail]/Drafts"    :key ?d)
+                          (:maildir "/[Gmail]/All Mail"  :key ?a)))
+            (setq mu4e-get-mail-command "mbsync -a && pkill -2 -u 1000 mu && sleep 1 && mu index --maildir=/home/ak/Mail"
+                  mu4e-update-interval 120
+                  mu4e-headers-auto-update t)
+        (setq mu4e-split-view 'vertical)
+                (setq mu4e-maildir-shortcuts
+                    '((:maildir "/Inbox"    :key ?i)
+                      (:maildir "/[Gmail]/Sent Mail" :key ?s)
+                      (:maildir "/[Gmail]/Trash"     :key ?t)
+                      (:maildir "/[Gmail]/Drafts"    :key ?d)
+                      (:maildir "/[Gmail]/All Mail"  :key ?a)))
   #+end_src
 
 ** xwidget based preview
    #+begin_src emacs-lisp
      (use-package mu4e-views
-  :straight t
+  :ensure t
        :after mu4e
        :defer nil
        :bind (:map mu4e-headers-mode-map
@@ -935,16 +944,124 @@ Install clangd from your distros package manager
        (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
        (setq mu4e-views-auto-view-selected-message t))
    #+end_src
+** Icons
+   #+begin_src emacs-lisp
+(use-package mu4e-marker-icons
+  :ensure t
+  :init (mu4e-marker-icons-mode 1))
+   #+end_src
+** ORG Mail
+   #+begin_src emacs-lisp
+     (use-package org-mime :ensure t)
+   #+end_src
+** dASHBOARD
+   #+begin_src emacs-lisp
+(use-package mu4e-dashboard
+:ensure nil
+:load-path "~/mu4e-dashboard"
+:custom (mu4e-dashboard-file "~/mu4e-dashboard/side-dashboard.org"))
+   #+end_src
 * GPG
   #+begin_src emacs-lisp
-  (use-package epa :straight t
+  (use-package epa :ensure t
   :defer t
   :config
   ;; Always replace encrypted text with plain text version
   (setq epa-replace-original-text t))
-(use-package epg :straight t
+(use-package epg :ensure t
   :defer t
   :config
   ;; Let Emacs query the passphrase through the minibuffer
   (setq epg-pinentry-mode 'loopback))
+  #+end_src
+* HASKELL
+  #+begin_src emacs-lisp
+(use-package haskell-mode)
+  #+end_src
+
+* Emacsclient
+  #+begin_src emacs-lisp
+    (if (daemonp)
+        (message "Loading in the daemon!")
+      (message "Loading in regular Emacs!"))
+    (setq doom-modeline-icon t)
+    (setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
+    (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
+    (setq auto-save-list-file-prefix (expand-file-name "tmp/auto-saves/sessions/" user-emacs-directory)
+          auto-save-file-name-transforms `((".*" ,(expand-file-name "tmp/auto-saves/" user-emacs-directory) t)))
+    (setq create-lockfiles nil)
+  #+end_src
+
+* Special scratch buffers
+  #+begin_src emacs-lisp
+        (defun xah-new-empty-buffer ()
+          "Create a new empty buffer.
+        New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
+
+        It returns the buffer (for elisp programing).
+
+        URL `http://ergoemacs.org/emacs/emacs_new_empty_buffer.html'
+        Version 2017-11-01"
+          (interactive)
+          (let (($buf (generate-new-buffer "untitled")))
+            (switch-to-buffer $buf)
+            (funcall initial-major-mode)
+            (setq buffer-offer-save t)
+            $buf
+            ))
+    (defun python-scratch () (interactive) (xah-new-empty-buffer)(python-mode)(company-mode))
+    (defun emacs-lisp-scratch () (interactive) (xah-new-empty-buffer)(emacs-lisp-mode)(company-mode))
+    (defun sh-scratch () (interactive) (xah-new-empty-buffer)(sh-mode)(company-mode))
+    (defun c-scratch () (interactive) (xah-new-empty-buffer)(c-mode)(company-mode))
+  #+end_src
+* General.el Keybindings
+#+begin_src emacs-lisp
+      (use-package general :ensure t
+    :config
+      (general-create-definer ak/leader-keys
+        :keymaps '(normal insert visual emacs)
+        :prefix "SPC"
+        :global-prefix "C-SPC"))
+
+      (ak/leader-keys
+        "l"  '(:ignore t :which-key "lsp")
+         "b b"   'ibuffer 
+         "b c"   'clone-indirect-buffer-other-window 
+         "b k"   'kill-current-buffer
+         "b n"   'next-buffer 
+         "b p"   'previous-buffer 
+         "b B"   'ibuffer-list-buffers 
+         "e b"   'eval-buffer 
+         "e d"   'eval-defun 
+         "e e"   'eval-expression 
+         "e l"   'eval-last-sexp
+         "e r"   'eval-region 
+         "b K"   'kill-buffer
+         "l d" 'xref-find-definitions
+         "l r" 'xref-find-references
+         "l n" 'lsp-ui-find-next-reference
+         "l p" 'lsp-ui-find-prev-reference
+         "l s" 'counsel-imenu
+         "l e" 'lsp-ui-flycheck-list
+         "l S" 'lsp-ui-sideline-mode
+         "l X" 'lsp-execute-code-action
+         "s p" 'python-scratch
+         "s l" 'emacs-lisp-scratch
+         "s c" 'c-scratch
+         "d s"   'sudo-edit)
+  (use-package sudo-edit :ensure t) ;; Utilities for opening files with sudo
+
+
+#+end_src
+
+* ORG Blog
+  #+begin_src emacs-lisp
+      (defun publish ()
+        "Publish to gi-yt.github.io"
+        (interactive)
+        (setq file (buffer-file-name))
+        (setq tags (read-string "Enter all tags seperated by comma no spaces: "))
+        (shell-command-to-string (format "bash ~/.local/bin/pandoc-org-md-blog %s" file))
+        (shell-command-to-string (format "alacritty -e bash ~/pages/test.sh %s" tags))
+    )
   #+end_src
