@@ -1,2 +1,5 @@
-* My DotFiles
-My Emacs Dotfiles
+* Contents
+- Bash
+- Xmonad
+- Xmobar
+- Emacs
