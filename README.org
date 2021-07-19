@@ -1,4 +1,5 @@
 #+options: toc:nil
+* Dotfiles
 * Contents
 - Bash
 - Xmonad
