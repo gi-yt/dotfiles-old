@@ -1,5 +1,89 @@
 #+title: Arya's GNU Emacs Configuration
 #+author: Arya Kiran
+* TOC :toc:
+- [[#basic-stuff][Basic stuff]]
+  - [[#disabling-annoyances-present-in-emacs][Disabling annoyances present in emacs]]
+  - [[#add-melpa-and-org-package-repositories-and-installing-use-package][Add melpa and org package repositories and installing use-package]]
+  - [[#garbage-collection][Garbage Collection]]
+  - [[#disable-scratch-buffer][Disable Scratch buffer]]
+- [[#custom-keybindinds-to-make-life-easier][Custom Keybindinds to make life easier]]
+  - [[#ivy--counsel--swiper][ivy + counsel + swiper]]
+  - [[#hotkey-based-config-reload][Hotkey based config reload]]
+  - [[#zooming-in-and-out][Zooming in and out]]
+  - [[#open-config][Open Config]]
+- [[#evil-mode-and-things-related-to-it][Evil Mode and things related to it]]
+  - [[#evil][Evil]]
+  - [[#make-q-kill-current-buffer][Make :q kill current buffer]]
+- [[#org-mode-additions][Org mode additions]]
+  - [[#keybindings][Keybindings]]
+  - [[#ui-improvements][UI Improvements]]
+  - [[#babel][Babel]]
+  - [[#toc][TOC]]
+- [[#qof-improvements][QOF improvements]]
+  - [[#0x0st][0x0.st]]
+  - [[#which-key][Which Key]]
+  - [[#make-esc-quit-prompts-like-c-g][Make <ESC> quit prompts like C-g]]
+  - [[#recent-files][Recent Files]]
+  - [[#keycast-mode][Keycast mode]]
+  - [[#rainbow-parenthesis][Rainbow Parenthesis]]
+  - [[#highlight-current-line][Highlight current line]]
+  - [[#colour-stuff][Colour Stuff]]
+  - [[#no-littering][No littering]]
+  - [[#remember-your-location-in-a-file][Remember your location in a file]]
+  - [[#generic-syntax-highlighting][Generic Syntax highlighting]]
+  - [[#buttonize-urls][Buttonize URLs]]
+  - [[#display-a-list-of-keybindings-for-the-current-major-mode][Display a list of keybindings for the current major mode]]
+- [[#making-emacs-look-nice][Making Emacs look nice]]
+  - [[#modeline][Modeline]]
+  - [[#theme][Theme]]
+  - [[#start-screen][Start screen]]
+- [[#git-via-magit][Git via Magit]]
+- [[#programming][Programming]]
+  - [[#yasnippet][Yasnippet]]
+  - [[#lsp--company][LSP + Company]]
+  - [[#lisp][LISP]]
+  - [[#htmlcssjs][HTML/CSS/JS]]
+  - [[#rust][Rust]]
+  - [[#bash][Bash]]
+  - [[#json][JSON]]
+  - [[#cc][C/C++]]
+  - [[#markdown][MarkDown]]
+  - [[#auto-close-bracket][Auto Close bracket]]
+  - [[#flycheck][FlyCheck]]
+  - [[#highlight-indentations][Highlight indentations]]
+  - [[#agressive-indent][Agressive indent]]
+  - [[#multiple-cursors][Multiple cursors]]
+- [[#vterm][VTerm]]
+- [[#pdf][PDF]]
+- [[#dired][Dired]]
+- [[#tabs][Tabs]]
+- [[#unicode-support][Unicode Support]]
+- [[#emoji][Emoji]]
+- [[#notifications][Notifications]]
+- [[#auto-save][Auto Save]]
+- [[#evil-nerd-commenter][Evil Nerd Commenter]]
+- [[#telegram][Telegram]]
+- [[#autosave][AutoSave]]
+- [[#undo-session-persist][Undo Session persist]]
+- [[#pdf-restore][PDF Restore]]
+- [[#misc][Misc]]
+- [[#better-c-x-o][Better C-x o]]
+- [[#hide-modeline][Hide ModeLine]]
+- [[#m-x-history][M-x History]]
+- [[#org-preview][Org Preview]]
+- [[#mu4e][MU4E]]
+  - [[#base][base]]
+  - [[#xwidget-based-preview][xwidget based preview]]
+  - [[#icons][Icons]]
+  - [[#org-mail][ORG Mail]]
+- [[#gpg][GPG]]
+- [[#haskell][HASKELL]]
+- [[#emacsclient][Emacsclient]]
+- [[#special-scratch-buffers][Special scratch buffers]]
+- [[#generalel-keybindings][General.el Keybindings]]
+- [[#org-blog][ORG Blog]]
+- [[#auto-update][Auto Update]]
+
 * Basic stuff
 ** Disabling annoyances present in emacs
    #+begin_src emacs-lisp
@@ -229,16 +313,6 @@
 ** Keycast mode
 #+begin_src emacs-lisp
         (use-package keycast :ensure t)
-      (with-eval-after-load 'keycast
-        (define-minor-mode keycast-mode
-          "Show current command and its key binding in the mode line."
-          :global t
-          (if keycast-mode
-              (add-hook 'pre-command-hook 'keycast--update t)
-            (remove-hook 'pre-command-hook 'keycast--update)))
-
-        (add-to-list 'global-mode-string '("" mode-line-keycast)))
-    (keycast-mode 1)
 #+end_src
 ** Rainbow Parenthesis
 #+begin_src emacs-lisp
@@ -296,9 +370,11 @@
 ** Modeline
 *** Getting Doom Emacs's modeline
     #+begin_src emacs-lisp
-      (use-package all-the-icons :ensure t)
-      (use-package doom-modeline :ensure t )
-(doom-modeline-mode 1)
+                        (use-package all-the-icons :ensure t)
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 20)))
     #+end_src
 *** Extra Widgets on Modeline
     #+begin_src emacs-lisp
@@ -320,7 +396,7 @@
     #+end_src
 ** Theme
    #+begin_src emacs-lisp
-          (use-package doom-themes :ensure t :init (load-theme 'doom-one))
+          (use-package doom-themes :ensure t :init (load-theme 'doom-dracula))
 
    #+end_src
 ** Start screen
@@ -630,119 +706,118 @@ Install clangd or clang-utils from your distros package manager
 #+end_src
 * Dired
 #+begin_src emacs-lisp
-      (use-package dired :ensure nil
-        :commands (dired dired-jump)
-        :bind (("C-x C-j" . dired-jump))
-        :custom ((dired-listing-switches "-agho --group-directories-first")))
+        (use-package dired-hide-dotfiles
+        :ensure t
+          :hook (dired-mode . dired-hide-dotfiles-mode)
+          :config
+          (evil-collection-define-key 'normal 'dired-mode-map
+            "H" 'dired-hide-dotfiles-mode))
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :bind (("C-x C-j" . dired-jump))
+  :custom ((dired-listing-switches "-agho --group-directories-first"))
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-single-up-directory
+    "l" 'dired-single-buffer))
 
-(use-package all-the-icons-dired :ensure t)
-(use-package dired-open :ensure t)
-(use-package peep-dired :ensure t)
+(use-package dired-single)
+
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+(use-package dired-open
+  :config
+  ;; Doesn't work as expected!
+  ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
+  (setq dired-open-extensions '(("png" . "feh")
+                                ("mkv" . "mpv"))))
+
+(use-package dired-hide-dotfiles
+  :hook (dired-mode . dired-hide-dotfiles-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "H" 'dired-hide-dotfiles-mode))
 
 
-(with-eval-after-load 'dired
-  (define-key dired-mode-map (kbd "M-p") 'peep-dired)
-  (evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
-  (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
-  (evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
-  (evil-define-key 'normal peep-dired-mode-map (kbd "k") 'peep-dired-prev-file))
-
-(add-hook 'peep-dired-hook 'evil-normalize-keymaps)
-;; Get file icons in dired
-(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-;; With dired-open plugin, you can launch external programs for certain extensions
-;; For example, I set all .png files to open in 'sxiv' and all .mp4 files to open in 'mpv'
-(setq dired-open-extensions '(("gif" . "sxiv")
-                              ("jpg" . "sxiv")
-                              ("png" . "sxiv")
-                              ("mkv" . "mpv")
-                              ("mp4" . "mpv")))
-
-      (use-package dired-hide-dotfiles
-      :ensure t
-        :hook (dired-mode . dired-hide-dotfiles-mode)
-        :config
-        (evil-collection-define-key 'normal 'dired-mode-map
-          "H" 'dired-hide-dotfiles-mode))
 #+end_src
 
-* Asynchronus processes
-#+begin_src emacs-lisp
-(use-package async :ensure t) 
-#+end_src
 * Tabs
 #+begin_src emacs-lisp
-    (use-package centaur-tabs
-    :ensure t
-    :config
-    (setq centaur-tabs-style "bar"
-           centaur-tabs-height 32
-           centaur-tabs-set-icons t
-           centaur-tabs-set-modified-marker t
-           centaur-tabs-show-navigation-buttons t
-           centaur-tabs-set-bar 'under
-           x-underline-at-descent-line t)
-    (centaur-tabs-headline-match)
-    ;; (setq centaur-tabs-gray-out-icons 'buffer)
-    ;; (centaur-tabs-enable-buffer-reordering)
-    ;; (setq centaur-tabs-adjust-buffer-order t)
-    (centaur-tabs-mode t)
-    (setq uniquify-separator "/")
-    (setq uniquify-buffer-name-style 'forward)
-    (defun centaur-tabs-buffer-groups ()
-      "`centaur-tabs-buffer-groups' control buffers' group rules.
+ (use-package centaur-tabs
+   :config
+   (setq centaur-tabs-style "bar"
+	  centaur-tabs-height 32
+	  centaur-tabs-set-icons t
+	  centaur-tabs-set-modified-marker t
+	  centaur-tabs-show-navigation-buttons t
+	  centaur-tabs-set-bar 'under
+	  x-underline-at-descent-line t)
+   (centaur-tabs-headline-match)
+   ;; (setq centaur-tabs-gray-out-icons 'buffer)
+   ;; (centaur-tabs-enable-buffer-reordering)
+   ;; (setq centaur-tabs-adjust-buffer-order t)
+   (centaur-tabs-mode t)
+   (setq uniquify-separator "/")
+   (setq uniquify-buffer-name-style 'forward)
+   (defun centaur-tabs-buffer-groups ()
+     "`centaur-tabs-buffer-groups' control buffers' group rules.
 
-  Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
-  All buffer name start with * will group to \"Emacs\".
-  Other buffer group by `centaur-tabs-get-group-name' with project name."
-      (list
-       (cond
-         ;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-         ;; "Remote")
-         ((or (string-equal "*" (substring (buffer-name) 0 1))
-              (memq major-mode '(magit-process-mode
-                                 magit-status-mode
-                                 magit-diff-mode
-                                 magit-log-mode
-                                 magit-file-mode
-                                 magit-blob-mode
-                                 magit-blame-mode
-                                 )))
-          "Emacs")
-         ((derived-mode-p 'prog-mode)
-          "Editing")
-         ((derived-mode-p 'dired-mode)
-          "Dired")
-         ((memq major-mode '(helpful-mode
-                             help-mode))
-          "Help")
-         ((memq major-mode '(org-mode
-                             org-agenda-clockreport-mode
-                             org-src-mode
-                             org-agenda-mode
-                             org-beamer-mode
-                             org-indent-mode
-                             org-bullets-mode
-                             org-cdlatex-mode
-                             org-agenda-log-mode
-                             diary-mode))
-          "OrgMode")
-         (t
-          (centaur-tabs-get-group-name (current-buffer))))))
-    :hook
-    (dashboard-mode . centaur-tabs-local-mode)
-    (term-mode . centaur-tabs-local-mode)
-    (vterm-mode . centaur-tabs-local-mode)
-    (calendar-mode . centaur-tabs-local-mode)
-    (org-agenda-mode . centaur-tabs-local-mode)
-    (helpful-mode . centaur-tabs-local-mode)
-    :bind
-    ("M-g" . centaur-tabs-counsel-switch-group)
-    ("C-c t g" . centaur-tabs-group-buffer-groups)
-    (:map evil-normal-state-map
-           ("g t" . centaur-tabs-forward)
-           ("g T" . centaur-tabs-backward)))
-(centaur-tabs-mode)
+ Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+ All buffer name start with * will group to \"Emacs\".
+ Other buffer group by `centaur-tabs-get-group-name' with project name."
+     (list
+      (cond
+	;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+	;; "Remote")
+	((or (string-equal "*" (substring (buffer-name) 0 1))
+	     (memq major-mode '(magit-process-mode
+				magit-status-mode
+				magit-diff-mode
+				magit-log-mode
+				magit-file-mode
+				magit-blob-mode
+				magit-blame-mode
+				)))
+	 "Emacs")
+	((derived-mode-p 'prog-mode)
+	 "Editing")
+	((derived-mode-p 'dired-mode)
+	 "Dired")
+	((memq major-mode '(helpful-mode
+			    help-mode))
+	 "Help")
+	((memq major-mode '(org-mode
+			    org-agenda-clockreport-mode
+			    org-src-mode
+			    org-agenda-mode
+			    org-beamer-mode
+			    org-indent-mode
+			    org-bullets-mode
+			    org-cdlatex-mode
+			    org-agenda-log-mode
+			    diary-mode))
+	 "OrgMode")
+	(t
+	 (centaur-tabs-get-group-name (current-buffer))))))
+   :hook
+   (dashboard-mode . centaur-tabs-local-mode)
+   (vterm-mode . centaur-tabs-local-mode)
+   (calendar-mode . centaur-tabs-local-mode)
+   (org-agenda-mode . centaur-tabs-local-mode)
+   (pdf-tools-mode . centaur-tabs-local-mode)
+   (helpful-mode . centaur-tabs-local-mode)
+   :bind
+   ("C-<prior>" . centaur-tabs-backward)
+   ("C-<next>" . centaur-tabs-forward)
+   ("C-c t s" . centaur-tabs-counsel-switch-group)
+   ("C-c t p" . centaur-tabs-group-by-projectile-project)
+   ("C-c t g" . centaur-tabs-group-buffer-groups)
+   (:map evil-normal-state-map
+	  ("g t" . centaur-tabs-forward)
+	  ("g T" . centaur-tabs-backward)))
+
   #+end_src
 
 * Unicode Support
@@ -866,7 +941,7 @@ Install clangd or clang-utils from your distros package manager
 #+end_src
 * Hide ModeLine
 #+begin_src emacs-lisp
-  (use-package hide-mode-line :ensure t :hook (vterm-mode . hide-mode-line-mode)(dashboard-mode . hide-mode-line-mode))
+  (use-package hide-mode-line :ensure t :hook (vterm-mode . hide-mode-line-mode)(dashboard-mode . hide-mode-line-mode)(pdf-tools-mode . hide-mode-line-mode))
 #+end_src
 
 * M-x History
@@ -954,13 +1029,6 @@ Install clangd or clang-utils from your distros package manager
    #+begin_src emacs-lisp
      (use-package org-mime :ensure t)
    #+end_src
-** dASHBOARD
-   #+begin_src emacs-lisp
-(use-package mu4e-dashboard
-:ensure nil
-:load-path "~/mu4e-dashboard"
-:custom (mu4e-dashboard-file "~/mu4e-dashboard/side-dashboard.org"))
-   #+end_src
 * GPG
   #+begin_src emacs-lisp
   (use-package epa :ensure t
@@ -1013,6 +1081,8 @@ Install clangd or clang-utils from your distros package manager
     (defun emacs-lisp-scratch () (interactive) (xah-new-empty-buffer)(emacs-lisp-mode)(company-mode))
     (defun sh-scratch () (interactive) (xah-new-empty-buffer)(sh-mode)(company-mode))
     (defun c-scratch () (interactive) (xah-new-empty-buffer)(c-mode)(company-mode))
+    (defun sh-scratch () (interactive) (xah-new-empty-buffer)(sh-mode)(company-mode))
+    (defun org-scratch () (interactive) (xah-new-empty-buffer)(org-mode))
   #+end_src
 * General.el Keybindings
 #+begin_src emacs-lisp
@@ -1024,19 +1094,18 @@ Install clangd or clang-utils from your distros package manager
         :global-prefix "C-SPC"))
 
       (ak/leader-keys
-        "l"  '(:ignore t :which-key "lsp")
-         "b b"   'ibuffer 
-         "b c"   'clone-indirect-buffer-other-window 
-         "b k"   'kill-current-buffer
-         "b n"   'next-buffer 
-         "b p"   'previous-buffer 
-         "b B"   'ibuffer-list-buffers 
-         "e b"   'eval-buffer 
-         "e d"   'eval-defun 
-         "e e"   'eval-expression 
-         "e l"   'eval-last-sexp
-         "e r"   'eval-region 
-         "b K"   'kill-buffer
+         "b b" 'ibuffer 
+         "b c" 'clone-indirect-buffer-other-window 
+         "b k" 'kill-current-buffer
+         "b n" 'next-buffer 
+         "b p" 'previous-buffer 
+         "b B" 'ibuffer-list-buffers 
+         "e b" 'eval-buffer 
+         "e d" 'eval-defun 
+         "e e" 'eval-expression 
+         "e l" 'eval-last-sexp
+         "e r" 'eval-region 
+         "b K" 'kill-buffer
          "l d" 'xref-find-definitions
          "l r" 'xref-find-references
          "l n" 'lsp-ui-find-next-reference
@@ -1048,7 +1117,12 @@ Install clangd or clang-utils from your distros package manager
          "s p" 'python-scratch
          "s l" 'emacs-lisp-scratch
          "s c" 'c-scratch
-         "d s"   'sudo-edit)
+         "s o" 'org-scratch
+         "s s" 'sh-scratch
+         "d s" 'sudo-edit
+         "d d" 'counsel-find-file
+         "g"   'magit-status
+         "SPC" 'counsel-M-x)
   (use-package sudo-edit :ensure t) ;; Utilities for opening files with sudo
 
 
@@ -1064,4 +1138,16 @@ Install clangd or clang-utils from your distros package manager
         (shell-command-to-string (format "bash ~/.local/bin/pandoc-org-md-blog %s" file))
         (shell-command-to-string (format "alacritty -e bash ~/pages/test.sh %s" tags))
     )
+  #+end_src
+
+* Auto Update
+  #+begin_src bash
+    (use-package auto-package-update
+      :custom
+      (auto-package-update-interval 7)
+      (auto-package-update-prompt-before-update t)
+      (auto-package-update-hide-results t)
+      :config
+      (auto-package-update-maybe)
+      (auto-package-update-at-time "09:00"))
   #+end_src
