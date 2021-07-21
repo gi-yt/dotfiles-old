@@ -1,2 +1,7 @@
-* My DotFiles
-My Emacs Dotfiles
+#+options: toc:nil
+* Dotfiles
+* Contents
+- Bash
+- Xmonad
+- Xmobar
+- Emacs
