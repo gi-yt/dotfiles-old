@@ -126,8 +126,26 @@
 
 ** Garbage Collection
    #+begin_src emacs-lisp
-     (use-package gcmh :ensure t)
-(gcmh-mode 1)
+     ;; Using garbage magic hack.
+      (use-package gcmh
+        :config
+        (gcmh-mode 1))
+     ;; Setting garbage collection threshold
+     (setq gc-cons-threshold 402653184
+           gc-cons-percentage 0.6)
+
+     ;; Profile emacs startup
+     (add-hook 'emacs-startup-hook
+               (lambda ()
+                 (message "*** Emacs loaded in %s with %d garbage collections."
+                          (format "%.2f seconds"
+                                  (float-time
+                                   (time-subtract after-init-time before-init-time)))
+                          gcs-done)))
+
+     ;; Silence compiler warnings as they can be pretty disruptive (setq comp-async-report-warnings-errors nil)
+(delete-selection-mode t)
+
    #+end_src
 ** Disable Scratch buffer
 #+begin_src emacs-lisp
@@ -283,7 +301,7 @@
    #+end_src
 ** Which Key
 #+begin_src emacs-lisp
-(use-package which-key :ensure t
+(use-package which-key
   :init
   (setq which-key-side-window-location 'bottom
         which-key-sort-order #'which-key-key-order-alpha
@@ -1086,58 +1104,64 @@ Install clangd or clang-utils from your distros package manager
   #+end_src
 * General.el Keybindings
 #+begin_src emacs-lisp
-      (use-package general :ensure t
-    :config
-      (general-create-definer ak/leader-keys
-        :keymaps '(normal insert visual emacs)
-        :prefix "SPC"
-        :global-prefix "C-SPC"))
+      (use-package general :ensure t)
 
-      (ak/leader-keys
-         "b b" 'ibuffer 
-         "b c" 'clone-indirect-buffer-other-window 
-         "b k" 'kill-current-buffer
-         "b n" 'next-buffer 
-         "b p" 'previous-buffer 
-         "b B" 'ibuffer-list-buffers 
-         "e b" 'eval-buffer 
-         "e d" 'eval-defun 
-         "e e" 'eval-expression 
-         "e l" 'eval-last-sexp
-         "e r" 'eval-region 
-         "b K" 'kill-buffer
-         "l d" 'xref-find-definitions
-         "l r" 'xref-find-references
-         "l n" 'lsp-ui-find-next-reference
-         "l p" 'lsp-ui-find-prev-reference
-         "l s" 'counsel-imenu
-         "l e" 'lsp-ui-flycheck-list
-         "l S" 'lsp-ui-sideline-mode
-         "l X" 'lsp-execute-code-action
-         "s p" 'python-scratch
-         "s l" 'emacs-lisp-scratch
-         "s c" 'c-scratch
-         "s o" 'org-scratch
-         "s s" 'sh-scratch
-         "d s" 'sudo-edit
-         "d d" 'counsel-find-file
-         "g"   'magit-status
+      (general-define-key
+       :keymaps '(normal insert visual emacs)
+       :prefix "SPC"
+       :global-prefix "C-SPC"
+
+         "bb" 'ibuffer 
+         "bk" 'kill-current-buffer
+         "bn" 'next-buffer 
+         "bp" 'previous-buffer 
+         "bB" 'ibuffer-list-buffers 
+         "bK" 'kill-buffer
+         "eb" 'eval-buffer 
+         "ed" 'eval-defun 
+         "ee" 'eval-expression 
+         "el" 'eval-last-sexp
+         "er" 'eval-region 
+         "ld" 'xref-find-definitions
+         "lr" 'xref-find-references
+         "ln" 'lsp-ui-find-next-reference
+         "lp" 'lsp-ui-find-prev-reference
+         "ls" 'counsel-imenu
+         "le" 'lsp-ui-flycheck-list
+         "lS" 'lsp-ui-sideline-mode
+         "lX" 'lsp-execute-code-action
+         "sp" 'python-scratch
+         "sl" 'emacs-lisp-scratch
+         "sc" 'c-scratch
+         "so" 'org-scratch
+         "ss" 'sh-scratch
+         "ds" 'sudo-edit
+         "dd" 'counsel-find-file
+         "gf" 'epa-encrypt-file
+         "gr" 'epa-encrypt-region
+         "gme" 'epa-mail-encrypt
+         "gmd" 'epa-mail-decrypt
+         "gms" 'epa-mail-sign
+         "gmv" 'epa-mail-verify
+         "gki" 'epa-import-keys
+         "gkd" 'epa-delete-keys
+         "gkl" 'epa-list-keys
+         "rt" 'newsticker-treeview
+         "rs" 'newsticker-start
+         "ra" 'newsticker-add-url
+         "."     '(find-file :which-key "Find file")
+         "d r"   '(counsel-recentf :which-key "Recent files")
+         "d s"   '(save-buffer :which-key "Save file")
+         "d c"   '(copy-file :which-key "Copy file")
+         "d D"   '(delete-file :which-key "Delete file")
+         "d r"   '(rename-file :which-key "Rename file")
+         "f S"   '(write-file :which-key "Save file as...")
          "SPC" 'counsel-M-x)
   (use-package sudo-edit :ensure t) ;; Utilities for opening files with sudo
-
-
 #+end_src
-
 * ORG Blog
   #+begin_src emacs-lisp
-      (defun publish ()
-        "Publish to gi-yt.github.io"
-        (interactive)
-        (setq file (buffer-file-name))
-        (setq tags (read-string "Enter all tags seperated by comma no spaces: "))
-        (shell-command-to-string (format "bash ~/.local/bin/pandoc-org-md-blog %s" file))
-        (shell-command-to-string (format "alacritty -e bash ~/pages/test.sh %s" tags))
-    )
+;; TODO
   #+end_src
 
 * Auto Update
