@@ -273,5 +273,94 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
  ### SETTING THE STARSHIP PROMPT ###
  eval "$(starship init bash)"
  eval "$(pandoc --bash-completion)"
- #BLE.sh
+ # BLE.sh
  source ~/.local/share/blesh/ble.sh
+ source ~/.local/share/please-use-xdg.sh
+ alias startx="startx ~/.config/X11/xinitrc"
+
+ # Use neovim for vim if present.
+ [ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+
+ # Use $XINITRC variable if file exists.
+ [ -f "$XINITRC" ] && alias startx="startx $XINITRC"
+
+ # sudo not required for some system commands
+ for command in mount umount sv pacman updatedb su ; do
+	 alias $command="sudo $command"
+ done; unset command
+
+ # Verbosity and settings that you pretty much just always are going to want.
+ alias \
+	 cp="cp -iv" \
+	 mv="mv -iv" \
+	 rm="rm -vI" \
+	 bc="bc -ql" \
+	 mkd="mkdir -pv" \
+	 yt="youtube-dl --add-metadata -i" \
+	 yta="yt -x -f bestaudio/best" \
+	 ffmpeg="ffmpeg -hide_banner"
+ alias diff="diff --color=auto"
+
+ # These common commands are just too long! Abbreviate them.
+ alias \
+	 ka="killall" \
+	 g="git" \
+	 sdn="sudo shutdown -h now" \
+	 e="$EDITOR" \
+	 v="$EDITOR" \
+	 z="zathura"
+ ## get rid of command not found ##
+ alias cd..='cd ..'
+ 
+ ## a quick way to get out of current directory ##
+ alias ..='cd ..'
+ alias ...='cd ../../../'
+ alias ....='cd ../../../../'
+ alias .....='cd ../../../../'
+ alias .4='cd ../../../../'
+ alias .5='cd ../../../../..'
+ alias mkdir='mkdir -pv'
+ alias path='echo -e ${PATH//:/\\n}'
+ alias now='date +"%T"'
+ alias nowtime=now
+ alias nowdate='date +"%d-%m-%Y"'
+ # Stop after sending count ECHO_REQUEST packets #
+ alias ping='ping -c 5'
+ # do not delete / or prompt if deleting more than 3 files at a time #
+ alias rm='rm -I --preserve-root'
+ 
+ # confirmation #
+ alias mv='mv -i'
+ alias cp='cp -i'
+ alias ln='ln -i'
+ 
+ # Parenting changing perms on / #
+ alias chown='chown --preserve-root'
+ alias chmod='chmod --preserve-root'
+ alias chgrp='chgrp --preserve-root'
+ ## pass options to free ##
+ alias meminfo='free -m -l -t'
+
+ ## get top process eating memory
+ alias psmem='ps auxf | sort -nr -k 4'
+ alias psmem10='ps auxf | sort -nr -k 4 | head -10'
+
+ ## get top process eating cpu ##
+ alias pscpu='ps auxf | sort -nr -k 3'
+ alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
+
+ ## Get server cpu info ##
+ alias cpuinfo='lscpu'
+
+ ## older system use /proc/cpuinfo ##
+ ##alias cpuinfo='less /proc/cpuinfo' ##
+
+ ## get GPU ram on desktop / laptop##
+ alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
+ alias pubip="dig +short myip.opendns.com @resolver1.opendns.com"
+ alias localip="sudo ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1'"
+ alias ips="sudo ifconfig -a | grep -o 'inet6\\? \\(addr:\\)\\?\\s\\?\\(\\(\\([0-9]\\+\\.\\)\\{3\\}[0-9]\\+\\)\\|[a-fA-F0-9:]\\+\\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+ alias pserver="python -m http.server --directory=$1"
+ alias mnt="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/dev/ | sort"
+ alias gh='history|grep'
+ alias count='find . -type f | wc -l'

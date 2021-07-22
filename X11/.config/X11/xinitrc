@@ -1,4 +1,3 @@
-pipewire &
 xmodmap ~/.config/X11/Xmodmap &
 xrdb merge ~/.config/X11/Xresources &
 exec xmonad
