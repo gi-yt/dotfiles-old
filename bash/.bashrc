@@ -196,6 +196,7 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
  colorscript random
 
+alias vim="nvim"
  ### BASH INSULTER ###
  if [ -f /etc/bash.command-not-found ]; then
      . /etc/bash.command-not-found
@@ -364,3 +365,4 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
  alias mnt="mount | awk -F' ' '{ printf \"%s\t%s\n\",\$1,\$3; }' | column -t | egrep ^/dev/ | sort"
  alias gh='history|grep'
  alias count='find . -type f | wc -l'
+export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc

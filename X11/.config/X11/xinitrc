@@ -1,3 +1,4 @@
 xmodmap ~/.config/X11/Xmodmap &
 xrdb merge ~/.config/X11/Xresources &
+gpg-connect-agent /bye &
 exec xmonad

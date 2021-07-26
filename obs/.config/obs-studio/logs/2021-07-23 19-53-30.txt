@@ -1,0 +1,119 @@
+07:53:30 PM IST.839: CPU Name: Intel(R) Core(TM) i3-6006U CPU @ 2.00GHz
+07:53:30 PM IST.839: CPU Speed: 1999.999MHz
+07:53:30 PM IST.840: Physical Cores: 2, Logical Cores: 4
+07:53:30 PM IST.840: Physical Memory: 7875MB Total, 2280MB Free
+07:53:30 PM IST.840: Kernel Version: Linux 5.12.16-gentoo-dist
+07:53:30 PM IST.840: Distribution: Gentoo Unknown
+07:53:30 PM IST.840: Session Type: tty
+07:53:30 PM IST.840: Window System: X11.0, Vendor: The X.Org Foundation, Version: 1.20.12
+07:53:30 PM IST.842: Portable mode: false
+07:53:30 PM IST.954: OBS 27.0.1 (linux)
+07:53:30 PM IST.954: ---------------------------------
+07:53:30 PM IST.955: ---------------------------------
+07:53:30 PM IST.955: audio settings reset:
+07:53:30 PM IST.955: 	samples per sec: 48000
+07:53:30 PM IST.955: 	speakers:        2
+07:53:30 PM IST.956: ---------------------------------
+07:53:30 PM IST.956: Initializing OpenGL...
+07:53:31 PM IST.119: Loading up OpenGL on adapter Intel Mesa Intel(R) HD Graphics 520 (SKL GT2)
+07:53:31 PM IST.119: OpenGL loaded successfully, version 4.6 (Core Profile) Mesa 21.1.4, shading language 4.60
+07:53:31 PM IST.140: ---------------------------------
+07:53:31 PM IST.140: video settings reset:
+07:53:31 PM IST.140: 	base resolution:   1920x1080
+07:53:31 PM IST.140: 	output resolution: 1920x1080
+07:53:31 PM IST.140: 	downscale filter:  Lanczos
+07:53:31 PM IST.140: 	fps:               30/1
+07:53:31 PM IST.140: 	format:            NV12
+07:53:31 PM IST.140: 	YUV mode:          709/Partial
+07:53:31 PM IST.140: NV12 texture support not available
+07:53:31 PM IST.147: Audio monitoring device:
+07:53:31 PM IST.147: 	name: Default
+07:53:31 PM IST.147: 	id: default
+07:53:31 PM IST.147: ---------------------------------
+07:53:31 PM IST.148: Failed to load 'en-US' text for module: 'decklink-captions.so'
+07:53:31 PM IST.149: Failed to load 'en-US' text for module: 'decklink-ouput-ui.so'
+07:53:31 PM IST.164: ---------------------------------
+07:53:31 PM IST.164:   Loaded Modules:
+07:53:31 PM IST.164:     rtmp-services.so
+07:53:31 PM IST.164:     obs-x264.so
+07:53:31 PM IST.164:     obs-transitions.so
+07:53:31 PM IST.164:     obs-outputs.so
+07:53:31 PM IST.164:     obs-filters.so
+07:53:31 PM IST.164:     obs-ffmpeg.so
+07:53:31 PM IST.164:     linux-capture.so
+07:53:31 PM IST.164:     linux-alsa.so
+07:53:31 PM IST.164:     image-source.so
+07:53:31 PM IST.164:     frontend-tools.so
+07:53:31 PM IST.164:     decklink-ouput-ui.so
+07:53:31 PM IST.164:     decklink-captions.so
+07:53:31 PM IST.164: ---------------------------------
+07:53:31 PM IST.164: ==== Startup complete ===============================================
+07:53:31 PM IST.172: All scene data cleared
+07:53:31 PM IST.172: ------------------------------------------------
+07:53:31 PM IST.180: xshm-input: Geometry 1920x1080 @ 0,0
+07:53:31 PM IST.187: alsa-input: Failed to open 'default': No such file or directory
+07:53:31 PM IST.187: Switched to scene 'Scene'
+07:53:31 PM IST.187: ------------------------------------------------
+07:53:31 PM IST.187: Loaded scenes:
+07:53:31 PM IST.187: - scene 'Scene':
+07:53:31 PM IST.190:     - source: 'Screen Capture (XSHM)' (xshm_input)
+07:53:31 PM IST.190:     - source: 'Audio Capture Device (ALSA)' (alsa_input_capture)
+07:53:31 PM IST.190: ------------------------------------------------
+07:53:32 PM IST.187: alsa-input: Failed to open 'default': No such file or directory
+07:53:34 PM IST.188: alsa-input: Failed to open 'default': No such file or directory
+07:53:35 PM IST.282: ---------------------------------
+07:53:35 PM IST.282: [x264 encoder: 'simple_h264_recording'] preset: veryfast
+07:53:35 PM IST.282: [x264 encoder: 'simple_h264_recording'] profile: high
+07:53:35 PM IST.282: [x264 encoder: 'simple_h264_recording'] settings:
+07:53:35 PM IST.282: 	rate_control: CRF
+07:53:35 PM IST.282: 	bitrate:      0
+07:53:35 PM IST.282: 	buffer size:  0
+07:53:35 PM IST.282: 	crf:          16
+07:53:35 PM IST.282: 	fps_num:      30
+07:53:35 PM IST.282: 	fps_den:      1
+07:53:35 PM IST.282: 	width:        1920
+07:53:35 PM IST.282: 	height:       1080
+07:53:35 PM IST.282: 	keyint:       250
+07:53:35 PM IST.282: 
+07:53:35 PM IST.291: ---------------------------------
+07:53:35 PM IST.291: [FFmpeg aac encoder: 'simple_aac_recording'] bitrate: 192, channels: 2, channel_layout: 3
+07:53:35 PM IST.291: 
+07:53:35 PM IST.298: ==== Recording Start ===============================================
+07:53:35 PM IST.299: [ffmpeg muxer: 'simple_file_output'] Writing file '/home/ak/Videos/2021-07-23 19-53-35.mp4'...
+07:53:37 PM IST.188: alsa-input: Failed to open 'default': No such file or directory
+07:53:41 PM IST.188: alsa-input: Failed to open 'default': No such file or directory
+07:53:46 PM IST.188: alsa-input: Failed to open 'default': No such file or directory
+07:53:51 PM IST.189: alsa-input: Failed to open 'default': No such file or directory
+07:53:56 PM IST.189: alsa-input: Failed to open 'default': No such file or directory
+07:54:01 PM IST.189: alsa-input: Failed to open 'default': No such file or directory
+07:54:06 PM IST.189: alsa-input: Failed to open 'default': No such file or directory
+07:54:11 PM IST.190: alsa-input: Failed to open 'default': No such file or directory
+07:54:16 PM IST.190: alsa-input: Failed to open 'default': No such file or directory
+07:54:21 PM IST.191: alsa-input: Failed to open 'default': No such file or directory
+07:54:26 PM IST.191: alsa-input: Failed to open 'default': No such file or directory
+07:54:31 PM IST.191: alsa-input: Failed to open 'default': No such file or directory
+07:54:36 PM IST.191: alsa-input: Failed to open 'default': No such file or directory
+07:54:41 PM IST.192: alsa-input: Failed to open 'default': No such file or directory
+07:54:46 PM IST.192: alsa-input: Failed to open 'default': No such file or directory
+07:54:51 PM IST.196: alsa-input: Failed to open 'default': No such file or directory
+07:54:56 PM IST.196: alsa-input: Failed to open 'default': No such file or directory
+07:55:01 PM IST.197: alsa-input: Failed to open 'default': No such file or directory
+07:55:06 PM IST.197: alsa-input: Failed to open 'default': No such file or directory
+07:55:11 PM IST.197: alsa-input: Failed to open 'default': No such file or directory
+07:55:16 PM IST.198: alsa-input: Failed to open 'default': No such file or directory
+07:55:21 PM IST.198: alsa-input: Failed to open 'default': No such file or directory
+07:55:26 PM IST.202: alsa-input: Failed to open 'default': No such file or directory
+07:55:26 PM IST.478: Switched to Preview/Program mode
+07:55:26 PM IST.478: ------------------------------------------------
+07:55:27 PM IST.673: [ffmpeg muxer: 'simple_file_output'] Output of file '/home/ak/Videos/2021-07-23 19-53-35.mp4' stopped
+07:55:27 PM IST.676: Output 'simple_file_output': stopping
+07:55:27 PM IST.676: Output 'simple_file_output': Total frames output: 3347
+07:55:27 PM IST.676: Output 'simple_file_output': Total drawn frames: 3369 (3371 attempted)
+07:55:27 PM IST.676: Output 'simple_file_output': Number of lagged frames due to rendering lag/stalls: 2 (0.1%)
+07:55:27 PM IST.677: ==== Recording Stop ================================================
+07:55:27 PM IST.679: Video stopped, number of skipped frames due to encoding lag: 1/3370 (0.0%)
+07:55:28 PM IST.888: Switched to scene 'Scene'
+07:55:28 PM IST.889: Switched to regular Preview mode
+07:55:28 PM IST.889: ------------------------------------------------
+07:55:31 PM IST.203: alsa-input: Failed to open 'default': No such file or directory
+07:55:36 PM IST.203: alsa-input: Failed to open 'default': No such file or directory

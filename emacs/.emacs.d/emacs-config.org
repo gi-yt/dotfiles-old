@@ -18,13 +18,11 @@
   - [[#keybindings][Keybindings]]
   - [[#ui-improvements][UI Improvements]]
   - [[#babel][Babel]]
-  - [[#toc][TOC]]
 - [[#qof-improvements][QOF improvements]]
   - [[#0x0st][0x0.st]]
   - [[#which-key][Which Key]]
   - [[#make-esc-quit-prompts-like-c-g][Make <ESC> quit prompts like C-g]]
   - [[#recent-files][Recent Files]]
-  - [[#keycast-mode][Keycast mode]]
   - [[#rainbow-parenthesis][Rainbow Parenthesis]]
   - [[#highlight-current-line][Highlight current line]]
   - [[#colour-stuff][Colour Stuff]]
@@ -84,6 +82,14 @@
 - [[#generalel-keybindings][General.el Keybindings]]
 - [[#org-blog][ORG Blog]]
 - [[#auto-update][Auto Update]]
+- [[#passwords][Passwords]]
+- [[#org-roam][ORG Roam]]
+- [[#battery][Battery]]
+- [[#hungry-delay][Hungry delay]]
+- [[#expand-region][EXpand Region]]
+- [[#temp-maiximizze][Temp Maiximizze]]
+- [[#quelpa][Quelpa]]
+- [[#pdf-continuos-scroll][PDF continuos scroll]]
 
 * Basic stuff
 ** Disabling annoyances present in emacs
@@ -120,12 +126,12 @@
       ;; Initialize use-package on non-Linux platforms
     (unless (package-installed-p 'use-package)
       (package-install 'use-package))
-    (setq package-native-compile t)
+    ;; (setq package-native-compile t)
     (require 'use-package)
     (setq use-package-always-ensure t)
 
   ;; Silence compiler warnings as they can be pretty disruptive
-  (setq native-comp-async-report-warnings-errors nil)
+  ;; (setq native-comp-async-report-warnings-errors nil)
 
 #+end_src
 
@@ -289,16 +295,10 @@
 #+begin_src emacs-lisp
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((emacs-lisp . nil)
+ '((emacs-lisp . t)
    (python . t)))
 (require 'ox-man)
 #+end_src
-** TOC
-   #+begin_src emacs-lisp
-(use-package toc-org :ensure t
-  :commands toc-org-enable
-  :init (add-hook 'org-mode-hook 'toc-org-enable))
-   #+end_src
 * QOF improvements
 ** 0x0.st
    #+begin_src emacs-lisp
@@ -333,10 +333,6 @@
      (setq recentf-max-menu-items 25)
      (global-set-key "\C-x\ \C-r" 'recentf-open-files)
    #+end_src
-** Keycast mode
-#+begin_src emacs-lisp
-        (use-package keycast :ensure t)
-#+end_src
 ** Rainbow Parenthesis
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
@@ -379,7 +375,7 @@
 ** Buttonize URLs
 #+begin_src emacs-lisp
 (use-package goto-addr :ensure t
-  :hook ((compilation-mode prog-mode eshell-mode shell-mode) . goto-address-mode)
+  :hook ((compilation-mode prog-mode vterm-mode shell-mode org-mode) . goto-address-mode)
   :bind (:map goto-address-highlight-keymap
          ("<RET>" . goto-address-at-point)
          ("M-<RET>" . newline)))
@@ -466,7 +462,7 @@
         (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
         :config
         ((let* (args)
-           )sp-enable-which-key-integration t))
+           )lsp-enable-which-key-integration t))
           (use-package lsp-ui :after lsp-mode
           :ensure t
         :hook (lsp-mode . lsp-ui-mode)
@@ -762,13 +758,6 @@ Install clangd or clang-utils from your distros package manager
        :config
        (evil-collection-define-key 'normal 'dired-mode-map
          "H" 'dired-hide-dotfiles-mode))
-     (use-package ranger)
-     (setq ranger-cleanup-on-disable t)
-     (setq ranger-show-hidden t)
-   (setq ranger-preview-file t)
-  (setq ranger-excluded-extensions '("mkv" "iso" "mp4"))
-(setq ranger-dont-show-binary t)
-(ranger-override-dired-mode t)
 
 
 #+end_src
@@ -920,10 +909,11 @@ Install clangd or clang-utils from your distros package manager
 
 * Telegram
 #+begin_src emacs-lisp
-    (use-package telega :ensure t)
-    (define-key global-map (kbd "C-c t") telega-prefix-map)
-    (setq telega-completing-read-function 'ivy-completing-read)
-    (setq telega-emoji-company-backend 'telega-company-emoji)
+  (use-package telega :ensure t)
+  (define-key global-map (kbd "C-c t") telega-prefix-map)
+  (setq telega-completing-read-function 'ivy-completing-read)
+  (setq telega-emoji-company-backend 'telega-company-emoji)
+  (setq telega-directory "~/.local/share/telega")
 #+end_src
 
 * AutoSave
@@ -1098,6 +1088,22 @@ Install clangd or clang-utils from your distros package manager
         (message "Loading in the daemon!")
       (message "Loading in regular Emacs!"))
     (setq doom-modeline-icon t)
+(use-package diminish
+  :ensure t
+  :init
+  (diminish 'which-key-mode)
+  (diminish 'linum-relative-mode)
+  (diminish 'hungry-delete-mode)
+  (diminish 'visual-line-mode)
+  (diminish 'subword-mode)
+  (diminish 'beacon-mode)
+  (diminish 'page-break-lines-mode)
+  (diminish 'auto-revert-mode)
+  (diminish 'rainbow-delimiters-mode)
+  (diminish 'rainbow-mode)
+  (diminish 'yas-minor-mode)
+  (diminish 'flycheck-mode))
+
     (setq backup-directory-alist `(("." . ,(expand-file-name "tmp/backups/" user-emacs-directory))))
     (make-directory (expand-file-name "tmp/auto-saves/" user-emacs-directory) t)
     (setq auto-save-list-file-prefix (expand-file-name "tmp/auto-saves/sessions/" user-emacs-directory)
@@ -1201,4 +1207,108 @@ Install clangd or clang-utils from your distros package manager
       :config
       (auto-package-update-maybe)
       (auto-package-update-at-time "09:00"))
+  #+end_src
+
+* Passwords
+  #+begin_src bash
+
+(defun efs/lookup-password (&rest keys)
+  (let ((result (apply #'auth-source-search keys)))
+    (if result
+        (funcall (plist-get (car result) :secret))
+        nil)))
+
+
+  #+end_src
+
+* ORG Roam
+  #+begin_src emacs-lisp
+            (use-package org-roam ;; Package is on melpa
+              :ensure t
+              :custom
+            (make-directory "~/org-roam") ;; The dir all notes are gonna be stored
+            (setq org-roam-directory (file-truename "~/org-roam"))
+            :bind (("C-c n l" . org-roam-buffer-toggle) ;; Binds
+                   ("C-c n f" . org-roam-node-find)
+                   ("C-c n g" . org-roam-graph) ;; Graph i was talking about.
+                   ("C-c n i" . org-roam-node-insert)
+                   ("C-c n c" . org-roam-capture)
+                   ;; Dailies
+                   ("C-c n j" . org-roam-dailies-capture-today))
+            :config
+            (org-roam-setup)
+            ;; If using org-roam-protocol
+            (require 'org-roam-protocol))
+            ;; (use-package org-roam-server) ;; There is server but havent gotten it  to work yet
+            ;; (setq org-roam-server-host "127.0.0.1"
+            ;;       org-roam-server-port 8080
+            ;;       org-roam-server-authenticate t
+            ;;       org-roam-server-export-inline-images t
+            ;;       org-roam-server-serve-files t
+            ;;       org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+            ;;       org-roam-server-network-poll t
+            ;;       org-roam-server-network-arrows nil
+            ;;       org-roam-server-network-label-truncate t
+            ;;       org-roam-server-network-label-truncate-length 60
+            ;;       org-roam-server-network-label-wrap-length 20)
+        (add-to-list 'display-buffer-alist
+                     '("\\*org-roam\\*"
+                       (display-buffer-in-direction)
+                       (direction . right)
+                       (window-width . 0.33)
+                       (window-height . fit-window-to-buffer)))
+        (setq org-roam-completion-everywhere t)
+      ;;   (setq org-roam-capture-templates '(("d" "default" plain "%?"
+      ;; :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+      ;;                    "#+title: ${title}\n"
+      ;;                    "#+filetags: ")
+      ;; :unnarrowed t))
+  #+end_src
+
+* Battery
+  #+begin_src emacs-lisp
+    (use-package fancy-battery
+      :ensure t
+      :init
+      (fancy-battery-mode 1)
+      (setq fancy-battery-show-percentage t))
+    (global-subword-mode 1)
+  #+end_src
+* Hungry delay
+  #+begin_src emacs-lisp
+(use-package hungry-delete
+  :ensure t
+  :config (global-hungry-delete-mode))
+  #+end_src
+
+* EXpand Region
+  #+begin_src emacs-lisp
+(use-package expand-region
+  :ensure t
+  :bind ("C-q" . er/expand-region))
+  #+end_src
+
+* Temp Maiximizze
+  #+begin_src emacs-lisp
+(defun toggle-maximize-buffer () "Maximize buffer"
+       (interactive)
+       (if (= 1 (length (window-list)))
+           (jump-to-register '_)
+         (progn
+           (set-register '_ (list (current-window-configuration)))
+           (delete-other-windows))))
+(global-set-key [(super shift return)] 'toggle-maximize-buffer) 
+  #+end_src
+* Quelpa
+  #+begin_src emacs-lisp
+(unless (package-installed-p 'quelpa)
+  (with-temp-buffer
+    (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
+    (eval-buffer)
+    (quelpa-self-upgrade)))
+  #+end_src
+* PDF continuos scroll
+  #+begin_src emacs-lisp
+    (quelpa '(pdf-continuous-scroll-mode :fetcher git :url "https://github.com/dalanicolai/pdf-continuous-scroll-mode.el.git"))
+    (add-hook 'pdf-view-mode-hook 'pdf-continuous-scroll-mode)
   #+end_src
