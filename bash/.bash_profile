@@ -40,5 +40,4 @@ export AWT_TOOLKIT="MToolkit wmname LG3D"	#May have to install wmname
 export _JAVA_AWT_WM_NONREPARENTING=1	# Fix for Java applications in dwm
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
-export GPG_TTY=$(tty)
 if [ -e /home/ak/.nix-profile/etc/profile.d/nix.sh ]; then . /home/ak/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer

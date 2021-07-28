@@ -366,3 +366,7 @@ alias vim="nvim"
  alias gh='history|grep'
  alias count='find . -type f | wc -l'
 export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc
+export GPG_TTY=$(tty)
+# vim
+export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
+export VIMDOTDIR="$XDG_CONFIG_HOME/vim"

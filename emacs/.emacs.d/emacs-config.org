@@ -226,6 +226,7 @@
 #+end_src
 * Evil Mode and things related to it
 ** Evil
+   I dont use evil anymore but just having it
 #+begin_src emacs-lisp
 
   (defun dw/evil-hook ()
@@ -1143,7 +1144,7 @@ Install clangd or clang-utils from your distros package manager
       (general-define-key
        :keymaps '(normal insert visual emacs)
        :prefix "SPC"
-       :global-prefix "C-SPC"
+       :global-prefix "M-SPC"
 
          "bb" 'ibuffer 
          "bk" 'kill-current-buffer
