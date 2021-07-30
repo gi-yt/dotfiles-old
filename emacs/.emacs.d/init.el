@@ -6,6 +6,7 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    '("88f59acbeacefb4998f45126d4d8ae8b2184f2a48753db362a349fd55321c7e1" "7a7b1d475b42c1a0b61f3b1d1225dd249ffa1abb1b7f726aec59ac7ca3bf4dae" "6c386d159853b0ee6695b45e64f598ed45bd67c47f671f69100817d7db64724d" default))
+ '(helm-minibuffer-history-key "M-p")
  '(highlight-indent-guides-character 124)
  '(keycast-log-mode nil)
  '(newsticker-url-list
@@ -35,14 +36,15 @@
      ("Linux Journal" "https://www.linuxjournal.com/node/feed" nil nil nil)
      ("Techradar" "https://www.techradar.com/in/rss/news/computing" nil nil nil)
      ("Arya" "https://aryak.codeberg.page/index.xml" nil nil nil)
-     ("CommandLine Heroes" "https://feeds.pacific-content.com/commandlineheroes" nil nil nil)))
+     ("CommandLine Heroes" "https://feeds.pacific-content.com/commandlineheroes" nil nil nil)
+     ("FOSS Nix" "https://fossnix.netlify.app/index.xml" nil nil nil)))
  '(newsticker-url-list-defaults
    '(("The Register" "https://www.theregister.co.uk/headlines.rss")
      ("Wired News" "https://www.wired.com/feed/rss")))
  '(org-modules
    '(ol-bbdb ol-bibtex ol-docview ol-eww ol-gnus ol-info ol-irc ol-mhe ol-rmail ol-w3m org-toc))
  '(package-selected-packages
-   '(scanner fzf org-roam-server ox-reveal pdf-continuous-scroll-mode quelpa multi-vterm diminish org-roam expand-region fancy-battery mu4e-alert dired-single daemons zerodark-theme spell-fu package-lint hackernews elfeed-goodies elfeed mu4e-dashboard org-mime mu4e-marker-icons company lsp-mode yasnippet pdf-tools lsp-rust cargo skewer-mode impatient-mode web-mode scheme-mode slime sly rust-mode lispyville lispy haskell-mode mu4e-views org-preview-html smex dired generic-x yasnippet-snippets which-key vterm use-package unicode-fonts undo-tree undo-fu-session toc-org telega super-save sudo-edit smartparens rainbow-mode rainbow-delimiters pyvenv python-mode py-autopep8 peep-dired pdf-view-restore org-bullets no-littering nix-mode multiple-cursors magit lsp-ui lsp-treemacs lsp-ivy keycast ivy-rich highlight-indent-guides hide-mode-line general flycheck evil-nerd-commenter evil-collection emojify doom-themes doom-modeline discover-my-major dired-open dired-hide-dotfiles dashboard counsel company-shell company-quickhelp company-nixos-options company-box centaur-tabs all-the-icons-ivy all-the-icons-dired alert aggressive-indent 0x0))
+   '(consult undo-fu scanner fzf org-roam-server ox-reveal pdf-continuous-scroll-mode quelpa multi-vterm diminish org-roam expand-region fancy-battery mu4e-alert dired-single daemons zerodark-theme spell-fu package-lint hackernews elfeed-goodies elfeed mu4e-dashboard org-mime mu4e-marker-icons company lsp-mode yasnippet pdf-tools lsp-rust cargo skewer-mode impatient-mode web-mode scheme-mode slime sly rust-mode lispyville lispy haskell-mode mu4e-views org-preview-html smex dired generic-x yasnippet-snippets which-key vterm use-package unicode-fonts undo-fu-session toc-org telega super-save sudo-edit smartparens rainbow-mode rainbow-delimiters pyvenv python-mode py-autopep8 peep-dired pdf-view-restore org-bullets no-littering nix-mode multiple-cursors magit lsp-ui lsp-treemacs lsp-ivy keycast ivy-rich highlight-indent-guides hide-mode-line general flycheck evil-nerd-commenter evil-collection emojify doom-themes doom-modeline discover-my-major dired-open dired-hide-dotfiles dashboard counsel company-shell company-quickhelp company-nixos-options company-box centaur-tabs all-the-icons-ivy all-the-icons-dired alert aggressive-indent 0x0))
  '(sml/mode-width (if (eq (powerline-current-separator) 'arrow) 'right 'full))
  '(sml/pos-id-separator
    '(""

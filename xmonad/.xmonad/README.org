@@ -532,14 +532,14 @@ myKeys =
 
     -- Emacs (CTRL-e followed by a key)
         -- , ("C-e e", spawn myEmacs)                 -- start emacs
-        , ("C-e e", spawn (myEmacs ++ ("--eval '(dashboard-refresh-buffer)'")))   -- emacs dashboard
-        , ("C-e b", spawn (myEmacs ++ ("--eval '(ibuffer)'")))   -- list buffers
-        , ("C-e d", spawn (myEmacs ++ ("--eval '(dired nil)'"))) -- dired
-        , ("C-e i", spawn (myEmacs ++ ("--eval '(erc-tls)'")))       -- erc irc client
-        , ("C-e m", spawn (myEmacs ++ ("--eval '(mu4e)'")))      -- mu4e email
+        , ("M-e e", spawn (myEmacs ++ ("--eval '(dashboard-refresh-buffer)'")))   -- emacs dashboard
+        , ("M-e b", spawn (myEmacs ++ ("--eval '(ibuffer)'")))   -- list buffers
+        , ("M-e d", spawn (myEmacs ++ ("--eval '(dired nil)'"))) -- dired
+        , ("M-e i", spawn (myEmacs ++ ("--eval '(erc-tls)'")))       -- erc irc client
+        , ("M-e m", spawn (myEmacs ++ ("--eval '(mu4e)'")))      -- mu4e email
         -- , ("C-e n", spawn (myEmacs ++ ("--eval '(elfeed)'")))    -- elfeed rss
         -- , ("C-e t", spawn (myEmacs ++ ("--eval '(mastodon)'")))  -- mastodon.el
-        , ("C-e v", spawn (myEmacs ++ ("--eval '(vterm nil)'"))) -- vterm if on GNU Emacs
+        -- , ("C-e v", spawn (myEmacs ++ ("--eval '(vterm nil)'"))) -- vterm if on GNU Emacs
     -- Multimedia Keys
         , ("<XF86AudioMute>", spawn "amixer set Master toggle")
         , ("<XF86AudioLowerVolume>", spawn "amixer set Master 5%- unmute")

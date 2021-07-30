@@ -224,57 +224,6 @@
 #+begin_src emacs-lisp
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/emacs-config.org")))
 #+end_src
-* Evil Mode and things related to it
-** Evil
-   I dont use evil anymore but just having it
-#+begin_src emacs-lisp
-
-  (defun dw/evil-hook ()
-    (dolist (mode '(custom-mode
-                    eshell-mode
-                    git-rebase-mode
-                    erc-mode
-                    term-mode))
-    (add-to-list 'evil-emacs-state-modes mode)))
-  (use-package undo-tree
-  :ensure t
-  :init
-  (global-undo-tree-mode 1))
-  (use-package evil
-  :ensure t
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-want-C-u-scroll t)
-    (setq evil-want-C-i-jump nil)
-    (setq evil-respect-visual-line-mode t)
-    (setq evil-undo-system 'undo-tree)
-    :config
-    (add-hook 'evil-mode-hook 'dw/evil-hook)
-    (evil-mode 1)
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal))
-  (use-package evil-collection :ensure t :after evil
-    :init
-    (setq evil-collection-company-use-tng nil)  ;; Is this a bug in evil-collection?
-    :custom
-    (evil-collection-outline-bind-tab-p nil)
-    :config
-    (setq evil-collection-mode-list
-          (remove 'lispy evil-collection-mode-list))
-    (evil-collection-init))
-
-
-#+end_src
-** Make :q kill current buffer
-#+begin_src emacs-lisp
-(evil-ex-define-cmd "q" 'kill-this-buffer)
-(evil-ex-define-cmd "quit" 'evil-quit)
-#+end_src
 * Org mode additions
 ** Keybindings
 #+begin_src emacs-lisp
@@ -363,24 +312,22 @@
    #+end_src
 ** Remember your location in a file
 #+begin_src emacs-lisp
-(use-package saveplace :ensure t
-  :unless noninteractive
-  :config (save-place-mode))
-
+  (save-place-mode 1) 
+  (setq save-place-file (locate-user-emacs-file "places" ".emacs-places"))
 #+end_src
 ** Generic Syntax highlighting
 #+begin_src emacs-lisp
-(require 'generic-x)
-
+  (require 'generic-x)
+  
 #+end_src
 ** Buttonize URLs
 #+begin_src emacs-lisp
-(use-package goto-addr :ensure t
-  :hook ((compilation-mode prog-mode vterm-mode shell-mode org-mode) . goto-address-mode)
-  :bind (:map goto-address-highlight-keymap
-         ("<RET>" . goto-address-at-point)
-         ("M-<RET>" . newline)))
-
+  (use-package goto-addr :ensure nil
+    :hook ((compilation-mode prog-mode vterm-mode shell-mode org-mode) . goto-address-mode)
+    :bind (:map goto-address-highlight-keymap
+                ("<RET>" . goto-address-at-point)
+                ("M-<RET>" . newline)))
+  
 #+end_src
 ** Display a list of keybindings for the current major mode
 #+begin_src emacs-lisp
@@ -390,34 +337,33 @@
 ** Modeline
 *** Getting Doom Emacs's modeline
     #+begin_src emacs-lisp
-                        (use-package all-the-icons :ensure t)
-
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 20)))
+      (use-package all-the-icons :ensure t)
+      (use-package doom-modeline
+        :init (doom-modeline-mode 1)
+        :custom ((doom-modeline-height 20)))
     #+end_src
 *** Extra Widgets on Modeline
     #+begin_src emacs-lisp
       (require 'display-line-numbers)
       (defcustom display-line-numbers-exempt-modes
-        '(vterm-mode eshell-mode shell-mode term-mode ansi-term-mode)
+        '(vterm-mode eshell-mode shell-mode term-mode ansi-term-mode pdf-view-mode)
         "Major modes on which to disable line numbers."
         :group 'display-line-numbers
         :type 'list
         :version "green")
       (defun display-line-numbers--turn-on ()
         "Turn on line numbers except for certain major modes.
-      Exempt major modes are defined in `display-line-numbers-exempt-modes'."
+            Exempt major modes are defined in `display-line-numbers-exempt-modes'."
         (unless (or (minibufferp)
                     (member major-mode display-line-numbers-exempt-modes))
           (display-line-numbers-mode)))
       (global-display-line-numbers-mode)
-(global-visual-line-mode t)
+      (global-visual-line-mode t)
     #+end_src
 ** Theme
    #+begin_src emacs-lisp
-          (use-package doom-themes :ensure t :init (load-theme 'doom-dracula))
-
+     (use-package doom-themes :ensure t :init (load-theme 'doom-dracula))
+     
    #+end_src
 ** Start screen
 #+begin_src emacs-lisp
@@ -425,9 +371,8 @@
     :init      ;; tweak dashboard config before loading it
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
-    (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor! It is an Operating System")
     (setq dashboard-startup-banner "~/.emacs.d/emacs-dash.png")  ;; use custom image as banner
-    (setq dashboard-center-content nil) ;; set to 't' for centered content
+    (setq dashboard-center-content t) ;; set to 't' for centered content
     (setq dashboard-items '((recents . 5)
                             (bookmarks . 3)))
     :config
@@ -677,44 +622,11 @@ Install clangd or clang-utils from your distros package manager
 #+end_src
 * VTerm
 #+begin_src emacs-lisp
-        (use-package vterm :ensure t :commands vterm :config (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  (setq vterm-shell "bash") (setq vterm-max-scrollback 10000))
-  (global-set-key (kbd "<s-return>") 'vterm)
+  (use-package vterm :ensure t :commands vterm :config (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  (setq vterm-shell "bash") (setq vterm-max-scrollback 10000))
   (setq vterm-kill-buffer-on-exit t)
-(use-package multi-vterm :ensure t
-	:config
-	(add-hook 'vterm-mode-hook
-			(lambda ()
-			(setq-local evil-insert-state-cursor 'box)
-			(evil-insert-state)))
-	(define-key vterm-mode-map [return]                      #'vterm-send-return)
-
-	(setq vterm-keymap-exceptions nil)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-f")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-a")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-v")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-b")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-w")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-u")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-n")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-m")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-p")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-j")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-k")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-r")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
-	(evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
-	(evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
-	(evil-define-key 'normal vterm-mode-map (kbd ",c")       #'multi-vterm)
-	(evil-define-key 'normal vterm-mode-map (kbd ",n")       #'multi-vterm-next)
-	(evil-define-key 'normal vterm-mode-map (kbd ",p")       #'multi-vterm-prev)
-	(evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
-	(evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
-	(evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
-#+end_src
+  (use-package multi-vterm :ensure t)
+    (setq vterm-keymap-exceptions nil)
+    #+end_src
 
 * PDF
 #+begin_src emacs-lisp
@@ -726,42 +638,31 @@ Install clangd or clang-utils from your distros package manager
 #+end_src
 * Dired
 #+begin_src emacs-lisp
-     (use-package dired-hide-dotfiles
-       :ensure t
-       :config
-       (evil-collection-define-key 'normal 'dired-mode-map
-         "H" 'dired-hide-dotfiles-mode))
-     (use-package dired
-       :ensure nil
-       :commands (dired dired-jump)
-       :bind (("C-x C-j" . dired-jump))
-       :custom ((dired-listing-switches "-agho --group-directories-first"))
-       :config
-       (evil-collection-define-key 'normal 'dired-mode-map
-         "h" 'dired-single-up-directory
-         "l" 'dired-single-buffer
-         (kbd "S-<return>") 'dired-single-buffer
-         (kbd "RET") 'dired-single-buffer))
-
-     (use-package dired-single)
-
-     (use-package all-the-icons-dired
-       :hook (dired-mode . all-the-icons-dired-mode))
-
-     (use-package dired-open
-       :config
-       ;; Doesn't work as expected!
-       ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
-       (setq dired-open-extensions '(("png" . "feh")
-                                     ("mkv" . "mpv"))))
-
-     (use-package dired-hide-dotfiles
-       :hook (dired-mode . dired-hide-dotfiles-mode)
-       :config
-       (evil-collection-define-key 'normal 'dired-mode-map
-         "H" 'dired-hide-dotfiles-mode))
-
-
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :bind (("C-x C-j" . dired-jump)
+       :map dired-mode-map
+       ("h" . dired-single-buffer-up-directory)
+       ("l" . dired-single-buffer)
+       ("RET" . dired-single-buffer)
+       ("S-RET" . dired-single-buffer)
+       )
+    :custom ((dired-listing-switches "-agho --group-directories-first")))
+  (use-package dired-single)
+  
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode))
+  
+  (use-package dired-open
+    :config
+    ;; Doesn't work as expected!
+    ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
+    (setq dired-open-extensions '(("png" . "feh")
+                  ("mkv" . "mpv"))))
+  
+  (use-package dired-hide-dotfiles
+    :hook (dired-mode . dired-hide-dotfiles-mode))
 #+end_src
 
 * Tabs
@@ -784,7 +685,7 @@ Install clangd or clang-utils from your distros package manager
     (setq uniquify-buffer-name-style 'forward)
     (defun centaur-tabs-buffer-groups ()
       "`centaur-tabs-buffer-groups' control buffers' group rules.
-
+  
   Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
   All buffer name start with * will group to \"Emacs\".
   Other buffer group by `centaur-tabs-get-group-name' with project name."
@@ -831,6 +732,7 @@ Install clangd or clang-utils from your distros package manager
     (helpful-mode . centaur-tabs-local-mode)
     (ranger-mode . centaur-tabs-local-mode)
     (dired-mode . centaur-tabs-local-mode)
+    (pdf-view-mode . centaur-tabs-local-mode)
     :bind
     ("C-<prior>" . centaur-tabs-backward)
     ("C-<next>" . centaur-tabs-forward)
@@ -840,7 +742,7 @@ Install clangd or clang-utils from your distros package manager
     (:map evil-normal-state-map
        ("g t" . centaur-tabs-forward)
        ("g T" . centaur-tabs-backward)))
-
+  
   #+end_src
 
 * Unicode Support
@@ -876,18 +778,17 @@ Install clangd or clang-utils from your distros package manager
 * Emoji
 #+begin_src emacs-lisp
   (use-package emojify
-  :ensure t
-    :hook (erc-mode . emojify-mode)
+    :ensure t
     :commands emojify-mode)
 #+end_src
 * Notifications
 #+begin_src emacs-lisp
   (use-package alert
-  :ensure t
-    :commands alert
-    :config
-    (setq alert-default-style 'libnotify))
-(global-emojify-mode t)
+      :ensure t
+      :commands alert
+      :config
+      (setq alert-default-style 'libnotify))
+  (global-emojify-mode t)
 #+end_src
 * Auto Save
 #+begin_src emacs-lisp
@@ -901,21 +802,18 @@ Install clangd or clang-utils from your distros package manager
 
 * Evil Nerd Commenter
 #+begin_src emacs-lisp
-
   (use-package evil-nerd-commenter
-  :ensure t
+    :ensure t
     :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
-
-#+end_src
+  #+end_src
 
 * Telegram
 #+begin_src emacs-lisp
+  (setq telega-directory "~/.local/share/telega")
   (use-package telega :ensure t)
   (define-key global-map (kbd "C-c t") telega-prefix-map)
   (setq telega-completing-read-function 'ivy-completing-read)
   (setq telega-emoji-company-backend 'telega-company-emoji)
-  (setq telega-directory "~/.local/share/telega")
 #+end_src
 
 * AutoSave
@@ -927,8 +825,14 @@ Install clangd or clang-utils from your distros package manager
 #+end_src
 * Undo Session persist
 #+begin_src emacs-lisp
-(use-package undo-fu-session :ensure t)
-  (global-undo-fu-session-mode)
+  (use-package undo-fu :ensure t)
+  (global-set-key (kbd "C-_")   'undo-fu-only-undo)
+  (global-set-key (kbd "M-_") 'undo-fu-only-redo)
+(use-package undo-fu-session
+  :config
+  (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")))
+
+(global-undo-fu-session-mode)
 #+end_src
 * PDF Restore
 #+begin_src emacs-lisp
@@ -964,7 +868,7 @@ Install clangd or clang-utils from your distros package manager
 #+end_src
 * Hide ModeLine
 #+begin_src emacs-lisp
-  (use-package hide-mode-line :ensure t :hook (vterm-mode . hide-mode-line-mode)(dashboard-mode . hide-mode-line-mode)(pdf-tools-mode . hide-mode-line-mode)(ranger-mode . hide-mode-line-mode)(dired-mode . hide-mode-line-mode))
+  (use-package hide-mode-line :ensure t :hook (vterm-mode . hide-mode-line-mode)(dashboard-mode . hide-mode-line-mode)(pdf-tools-mode . hide-mode-line-mode)(ranger-mode . hide-mode-line-mode)(dired-mode . hide-mode-line-mode)(pdf-view-mode . hide-mode-line-mode))
 #+end_src
 
 * M-x History
@@ -1068,12 +972,12 @@ Install clangd or clang-utils from your distros package manager
    #+end_src
 * GPG
   #+begin_src emacs-lisp
-  (use-package epa :ensure t
+  (use-package epa :ensure nil
   :defer t
   :config
   ;; Always replace encrypted text with plain text version
   (setq epa-replace-original-text t))
-(use-package epg :ensure t
+(use-package epg :ensure nil
   :defer t
   :config
   ;; Let Emacs query the passphrase through the minibuffer
@@ -1139,64 +1043,71 @@ Install clangd or clang-utils from your distros package manager
   #+end_src
 * General.el Keybindings
 #+begin_src emacs-lisp
-      (use-package general :ensure t)
-
-      (general-define-key
-       :keymaps '(normal insert visual emacs)
-       :prefix "SPC"
-       :global-prefix "M-SPC"
-
-         "bb" 'ibuffer 
-         "bk" 'kill-current-buffer
-         "bn" 'next-buffer 
-         "bp" 'previous-buffer 
-         "bB" 'ibuffer-list-buffers 
-         "bK" 'kill-buffer
-         "eb" 'eval-buffer 
-         "ed" 'eval-defun 
-         "ee" 'eval-expression 
-         "el" 'eval-last-sexp
-         "er" 'eval-region 
-         "ld" 'xref-find-definitions
-         "lr" 'xref-find-references
-         "ln" 'lsp-ui-find-next-reference
-         "lp" 'lsp-ui-find-prev-reference
-         "ls" 'counsel-imenu
-         "le" 'lsp-ui-flycheck-list
-         "lS" 'lsp-ui-sideline-mode
-         "lX" 'lsp-execute-code-action
-         "sp" 'python-scratch
-         "sl" 'emacs-lisp-scratch
-         "sc" 'c-scratch
-         "so" 'org-scratch
-         "ss" 'sh-scratch
-         "ds" 'sudo-edit
-         "dd" 'counsel-find-file
-         "gf" 'epa-encrypt-file
-         "gr" 'epa-encrypt-region
-         "gme" 'epa-mail-encrypt
-         "gmd" 'epa-mail-decrypt
-         "gms" 'epa-mail-sign
-         "gmv" 'epa-mail-verify
-         "gki" 'epa-import-keys
-         "gkd" 'epa-delete-keys
-         "gkl" 'epa-list-keys
-         "rt" 'newsticker-treeview
-         "rs" 'newsticker-start
-         "ra" 'newsticker-add-url
-         "."     '(find-file :which-key "Find file")
-         "d r"   '(counsel-recentf :which-key "Recent files")
-         "d s"   '(save-buffer :which-key "Save file")
-         "d c"   '(copy-file :which-key "Copy file")
-         "d D"   '(delete-file :which-key "Delete file")
-         "d r"   '(rename-file :which-key "Rename file")
-         "f S"   '(write-file :which-key "Save file as...")
-         "SPC" 'counsel-M-x)
-  (use-package sudo-edit :ensure t) ;; Utilities for opening files with sudo
+    (use-package general :ensure t)
+    (global-unset-key (kbd "C-z"))
+    (general-define-key
+     :prefix "C-z"
+     "bb" 'ibuffer 
+     "bk" 'kill-current-buffer
+     "bn" 'next-buffer 
+     "bp" 'previous-buffer 
+     "bB" 'ibuffer-list-buffers 
+     "bK" 'kill-buffer
+     "eb" 'eval-buffer 
+     "ed" 'eval-defun 
+     "ee" 'eval-expression 
+     "el" 'eval-last-sexp
+     "er" 'eval-region 
+     "ld" 'xref-find-definitions
+     "lr" 'xref-find-references
+     "ln" 'lsp-ui-find-next-reference
+     "lp" 'lsp-ui-find-prev-reference
+     "ls" 'counsel-imenu
+     "le" 'lsp-ui-flycheck-list
+     "lS" 'lsp-ui-sideline-mode
+     "lX" 'lsp-execute-code-action
+     "sp" 'python-scratch
+     "sl" 'emacs-lisp-scratch
+     "sc" 'c-scratch
+     "so" 'org-scratch
+     "ss" 'sh-scratch
+     "ds" 'sudo-edit
+     "dd" 'counsel-find-file
+     "gf" 'epa-encrypt-file
+     "gr" 'epa-encrypt-region
+     "gme" 'epa-mail-encrypt
+     "gmd" 'epa-mail-decrypt
+     "gms" 'epa-mail-sign
+     "gmv" 'epa-mail-verify
+     "gki" 'epa-import-keys
+     "gkd" 'epa-delete-keys
+     "gkl" 'epa-list-keys
+     "rt" 'newsticker-treeview
+     "rs" 'newsticker-start
+     "ra" 'newsticker-add-url
+     "."     '(find-file :which-key "Find file")
+     "d r"   '(counsel-recentf :which-key "Recent files")
+     "d s"   '(save-buffer :which-key "Save file")
+     "d c"   '(copy-file :which-key "Copy file")
+     "d D"   '(delete-file :which-key "Delete file")
+     "d r"   '(rename-file :which-key "Rename file")
+     "f S"   '(write-file :which-key "Save file as...")
+     "SPC" 'counsel-M-x)
+    (use-package sudo-edit :ensure t) ;; Utilities for opening files with sudo
 #+end_src
 * ORG Blog
   #+begin_src emacs-lisp
-;; TODO
+        (defun create-blog-post ()
+            "Create an org file in ~/source/myblog/posts."
+            (interactive)
+            (let ((name (read-string "Filename: ")))
+            (expand-file-name (format "%s.org" name) "~/fossnix/posts")))
+    
+    (setq org-capture-templates
+            '(("p" "Post" plain
+                    (file create-blog-post)
+                    (file "~/fossnix/org-templates/post.orgcaptmpl"))))
+    
   #+end_src
 
 * Auto Update
@@ -1265,6 +1176,7 @@ Install clangd or clang-utils from your distros package manager
     ;;                    "#+filetags: ")
     ;; :unnarrowed t))
 
+(setq org-roam-v2-ack t)
           (org-roam-setup)
   #+end_src
 
@@ -1314,4 +1226,155 @@ Install clangd or clang-utils from your distros package manager
   #+begin_src emacs-lisp
     (quelpa '(pdf-continuous-scroll-mode :fetcher git :url "https://github.com/dalanicolai/pdf-continuous-scroll-mode.el.git"))
     (add-hook 'pdf-view-mode-hook 'pdf-continuous-scroll-mode)
+  #+end_src
+
+* Newline like evil
+  #+begin_src emacs-lisp
+    ;; Behave like vi's o command
+    (defun open-next-line (arg)
+      "Move to the next line and then opens a line.
+     See also `newline-and-indent'."
+      (interactive "p")
+      (end-of-line)
+      (open-line arg)
+      (forward-line 1)
+      (when newline-and-indent
+        (indent-according-to-mode)))
+    (global-set-key (kbd "C-o") 'open-next-line)
+    ;; Behave like vi's O command
+    (defun open-previous-line (arg)
+      "Open a new line before the current one. 
+     See also `newline-and-indent'."
+      (interactive "p")
+      (beginning-of-line)
+      (open-line arg)
+      (when newline-and-indent
+        (indent-according-to-mode)))
+        (global-set-key (kbd "M-o") 'open-previous-line)
+    (global-set-key (kbd "C-S-o") 'open-previous-line)
+    ;; Autoindent open-*-lines
+    (defvar newline-and-indent t
+      "Modify the behavior of the open-*-line functions to cause them to autoindent.")
+        (global-set-key [S-return]   'open-next-line)
+    (global-set-key [C-S-return] 'open-previous-line)
+  #+end_src
+
+* Consult.el
+  #+begin_src emacs-lisp
+;; Example configuration for Consult
+(use-package consult
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings (mode-specific-map)
+         ("C-c h" . consult-history)
+         ("C-c m" . consult-mode-command)
+         ("C-c b" . consult-bookmark)
+         ("C-c k" . consult-kmacro)
+         ;; C-x bindings (ctl-x-map)
+         ("M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ("<help> a" . consult-apropos)            ;; orig. apropos-command
+         ;; M-g bindings (goto-map)
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-project)
+         ;; M-s bindings (search-map)
+         ("M-s f" . consult-find)
+         ("M-s F" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s m" . consult-multi-occur)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
+
+  ;; Enable automatic preview at point in the *Completions* buffer.
+  ;; This is relevant when you use the default completion UI,
+  ;; and not necessary for Vertico, Selectrum, etc.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-file consult--source-project-file consult--source-bookmark
+   :preview-key (kbd "M-."))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both  and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; Optionally configure a function which returns the project root directory.
+  ;; There are multiple reasonable alternatives to chose from.
+  ;;;; 1. project.el (project-roots)
+  (setq consult-project-root-function
+        (lambda ()
+          (when-let (project (project-current))
+            (car (project-roots project)))))
+  ;;;; 2. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-root-function #'projectile-project-root)
+  ;;;; 3. vc.el (vc-root-dir)
+  ;; (setq consult-project-root-function #'vc-root-dir)
+  ;;;; 4. locate-dominating-file
+  ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
+)
   #+end_src
