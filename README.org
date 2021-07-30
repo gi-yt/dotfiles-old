@@ -5,3 +5,12 @@
 - Xmonad
 - Xmobar
 - Emacs
+- Qutebrowser
+- X11
+- XDG
+- AutoRandr
+- Flameshot
+- Git
+- Starship
+- Qutebrowser
+- OBS
