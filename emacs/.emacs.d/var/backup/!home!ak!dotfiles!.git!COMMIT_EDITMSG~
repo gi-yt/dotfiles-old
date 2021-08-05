@@ -1,0 +1,95 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+# Your branch is up to date with 'origin/main'.
+#
+# Changes to be committed:
+#	deleted:    .gitignore
+#	deleted:    X11/.config/X11/Xmodmap
+#	deleted:    X11/.config/X11/Xresources
+#	deleted:    X11/.config/X11/xinitrc
+#	deleted:    XDG/.config/mimeapps.list
+#	deleted:    XDG/.config/user-dirs.dirs
+#	deleted:    XDG/.config/user-dirs.locale
+#	deleted:    autorandr/.config/autorandr/docked/config
+#	deleted:    autorandr/.config/autorandr/docked/setup
+#	deleted:    autorandr/.config/autorandr/move/config
+#	deleted:    autorandr/.config/autorandr/move/setup
+#	deleted:    bash/.bash_profile
+#	deleted:    bash/.bashrc
+#	deleted:    emacs/.authinfo.gpg
+#	deleted:    emacs/.emacs.d/emacs-config.org
+#	deleted:    emacs/.emacs.d/emacs-dash.png
+#	deleted:    emacs/.emacs.d/init.el
+#	deleted:    flameshot/.config/flameshot/flameshot.ini
+#	deleted:    git/.git-cred.gpg
+#	deleted:    git/.gitconfig
+#	deleted:    obs/.config/obs-studio/basic/profiles/Untitled/basic.ini
+#	deleted:    obs/.config/obs-studio/basic/scenes/Untitled.json
+#	deleted:    obs/.config/obs-studio/basic/scenes/Untitled.json.bak
+#	deleted:    obs/.config/obs-studio/global.ini
+#	deleted:    obs/.config/obs-studio/logs/2021-07-15 17-28-38.txt
+#	deleted:    obs/.config/obs-studio/logs/2021-07-16 12-31-51.txt
+#	deleted:    obs/.config/obs-studio/logs/2021-07-19 11-15-08.txt
+#	deleted:    obs/.config/obs-studio/logs/2021-07-23 19-53-30.txt
+#	deleted:    obs/.config/obs-studio/logs/2021-07-23 19-57-23.txt
+#	deleted:    obs/.config/obs-studio/logs/2021-07-27 21-56-27.txt
+#	deleted:    obs/.config/obs-studio/logs/2021-07-30 12-14-11.txt
+#	deleted:    obs/.config/obs-studio/plugin_config/rtmp-services/meta.json
+#	deleted:    obs/.config/obs-studio/plugin_config/rtmp-services/package.json
+#	deleted:    obs/.config/obs-studio/plugin_config/rtmp-services/services.json
+#	deleted:    obs/.config/obs-studio/plugin_config/rtmp-services/twitch_ingests.json
+#	deleted:    obs/.config/obs-studio/profiler_data/2021-07-15 17-28-38.csv.gz
+#	deleted:    obs/.config/obs-studio/profiler_data/2021-07-19 11-15-08.csv.gz
+#	deleted:    obs/.config/obs-studio/profiler_data/2021-07-23 19-57-23.csv.gz
+#	deleted:    obs/.config/obs-studio/profiler_data/2021-07-27 21-56-27.csv.gz
+#	deleted:    obs/.config/obs-studio/profiler_data/2021-07-30 12-14-11.csv.gz
+#	deleted:    qutebrowser/.config/qutebrowser/autoconfig.yml
+#	deleted:    qutebrowser/.config/qutebrowser/bookmarks/urls
+#	deleted:    qutebrowser/.config/qutebrowser/config.py
+#	deleted:    qutebrowser/.config/qutebrowser/draw.py
+#	deleted:    qutebrowser/.config/qutebrowser/qsettings/QtProject.conf
+#	deleted:    qutebrowser/.config/qutebrowser/quickmarks
+#	deleted:    starship/.config/starship.toml
+#	deleted:    xmonad/.config/xmobar/battery.sh
+#	deleted:    xmonad/.config/xmobar/trayer-padding-icon.sh
+#	deleted:    xmonad/.config/xmobar/wireless.sh
+#	deleted:    xmonad/.config/xmobar/xmobarrc0
+#	deleted:    xmonad/.config/xmobar/xmobarrc2
+#	deleted:    xmonad/.xmonad/README.org
+#	deleted:    xmonad/.xmonad/a.sh
+#	deleted:    xmonad/.xmonad/pacman-hooks/recompile-xmonad.hook
+#	deleted:    xmonad/.xmonad/pacman-hooks/recompile-xmonad.hook.zst
+#	deleted:    xmonad/.xmonad/pacman-hooks/recompile-xmonadh.hook
+#	deleted:    xmonad/.xmonad/pacman-hooks/recompile-xmonadh.hook.zst
+#	deleted:    xmonad/.xmonad/xmonad-example-configs/xmonad-example-polybar-treeselect-workspaces.hs
+#	deleted:    xmonad/.xmonad/xmonad-example-configs/xmonad-example-polybar-treeselect-workspaces.hs.zst
+#	deleted:    xmonad/.xmonad/xmonad-example-configs/xmonad-example-xmobar-clickable-workspaces.hs
+#	deleted:    xmonad/.xmonad/xmonad-example-configs/xmonad-example-xmobar-clickable-workspaces.hs.zst
+#	deleted:    xmonad/.xmonad/xmonad-example-configs/xmonad-example-xmobar-non-clickable.hs
+#	deleted:    xmonad/.xmonad/xmonad-example-configs/xmonad-example-xmobar-non-clickable.hs.zst
+#	deleted:    xmonad/.xmonad/xmonad-example-configs/xmonad-example-xmobar-treeselect-workspaces.hs
+#	deleted:    xmonad/.xmonad/xmonad-example-configs/xmonad-example-xmobar-treeselect-workspaces.hs.zst
+#	deleted:    xmonad/.xmonad/xmonad-x86_64-linux
+#	deleted:    xmonad/.xmonad/xmonad.errors
+#	deleted:    xmonad/.xmonad/xmonad.hi
+#	deleted:    xmonad/.xmonad/xmonad.hs
+#	deleted:    xmonad/.xmonad/xmonad.o
+#	deleted:    xmonad/.xmonad/xmonadctl.hs
+#	deleted:    xmonad/.xmonad/xpm/calendar-clock-icon_20.xpm
+#	deleted:    xmonad/.xmonad/xpm/calendar-clock-icon_20.xpm.zst
+#	deleted:    xmonad/.xmonad/xpm/cpu_20.xpm
+#	deleted:    xmonad/.xmonad/xpm/cpu_20.xpm.zst
+#	deleted:    xmonad/.xmonad/xpm/harddisk-icon_20.xpm
+#	deleted:    xmonad/.xmonad/xpm/harddisk-icon_20.xpm.zst
+#	deleted:    xmonad/.xmonad/xpm/haskell_20.xpm
+#	deleted:    xmonad/.xmonad/xpm/haskell_20.xpm.zst
+#	deleted:    xmonad/.xmonad/xpm/memory-icon_20.xpm
+#	deleted:    xmonad/.xmonad/xpm/memory-icon_20.xpm.zst
+#	deleted:    xmonad/.xmonad/xpm/net_down_20.xpm
+#	deleted:    xmonad/.xmonad/xpm/net_down_20.xpm.zst
+#	deleted:    xmonad/.xmonad/xpm/net_up_20.xpm
+#	deleted:    xmonad/.xmonad/xpm/net_up_20.xpm.zst
+#

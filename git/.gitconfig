@@ -1,0 +1,8 @@
+[user]
+	email = aryakiran@zohomail.eu
+	name = Arya Kiran
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential]
+	helper = store
