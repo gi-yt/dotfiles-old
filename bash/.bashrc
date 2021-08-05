@@ -196,7 +196,6 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
  colorscript random
 
-alias vim="nvim"
  ### BASH INSULTER ###
  if [ -f /etc/bash.command-not-found ]; then
      . /etc/bash.command-not-found

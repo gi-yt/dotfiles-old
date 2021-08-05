@@ -652,7 +652,7 @@ Display and insert emojis in emacs
 (global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop)
 #+end_src
 
-* LOL
+* Vterm
 #+begin_src emacs-lisp
-  (message "Hel")
+(use-package vterm :straight t)
 #+end_src

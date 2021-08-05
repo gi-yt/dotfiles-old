@@ -464,7 +464,7 @@
     (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
 (global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop)
 
-(message "Hel")
+(use-package vterm :straight t)
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 

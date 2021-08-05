@@ -11,8 +11,7 @@ a(){
     then
         echo "xmobar -x 0 $HOME/.config/xmobar/xmobarrc0"
     else
-        echo Stupid
-        exit 0
+        echo "xmobar -x 0 $HOME/.config/xmobar/xmobarrc2"
     fi
 }
 while [ ! $# -eq 0 ]
