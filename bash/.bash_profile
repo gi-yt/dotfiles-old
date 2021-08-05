@@ -4,8 +4,7 @@
 
 # I use vterm, but for many things alacritty is better
 export TERMINAL="alacritty"
-# Firefox for now switching to qutebrowser
-export BROWSER="firefox"
+export BROWSER="qutebrowser"
 
 # ~/ Clean-up:
 export XDG_CONFIG_HOME="$HOME/.config"
