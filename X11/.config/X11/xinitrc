@@ -1,4 +1,4 @@
 xrdb merge ~/.config/X11/Xresources &
 gpg-connect-agent /bye &
 # exec xmonad
-exec emacs -mm
+exec emacs -mm 

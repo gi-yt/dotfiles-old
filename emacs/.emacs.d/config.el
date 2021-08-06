@@ -464,9 +464,17 @@
     (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
 (global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop)
 
-(use-package vterm :straight t)
+(use-package vterm :straight t :defer t)
+(use-package multi-vterm :straight t :defer t
+  :bind ("s-<return>" . multi-vterm))
 
 (use-package telega :defer t)
+
+(use-package edwina
+  :config
+  (setq display-buffer-base-action '(display-buffer-below-selected))
+  (edwina-setup-dwm-keys)
+  (edwina-mode 1))
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 

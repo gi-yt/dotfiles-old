@@ -654,10 +654,21 @@ Display and insert emojis in emacs
 
 * Vterm
 #+begin_src emacs-lisp
-(use-package vterm :straight t)
+  (use-package vterm :straight t :defer t)
+  (use-package multi-vterm :straight t :defer t
+    :bind ("s-<return>" . multi-vterm))
 #+end_src
 
 * Telega
 #+begin_src emacs-lisp
   (use-package telega :defer t)
+#+end_src
+
+* Edwina
+#+begin_src emacs-lisp
+  (use-package edwina
+    :config
+    (setq display-buffer-base-action '(display-buffer-below-selected))
+    (edwina-setup-dwm-keys)
+    (edwina-mode 1))
 #+end_src
