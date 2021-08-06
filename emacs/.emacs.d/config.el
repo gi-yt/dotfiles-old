@@ -160,7 +160,7 @@
   :straight t
   :bind ("C-q" . er/expand-region))
 
-(setq org-ellipsis " ▾")
+(setq org-ellipsis "▾")
 (defun ak-org-hooks ()
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -465,6 +465,8 @@
 (global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop)
 
 (use-package vterm :straight t)
+
+(use-package telega :defer t)
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 

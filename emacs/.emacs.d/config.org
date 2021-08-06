@@ -235,7 +235,7 @@ Very useful for selecting text
 * ORG
 ** Additions
    #+begin_src emacs-lisp
-     (setq org-ellipsis " ▾")
+     (setq org-ellipsis "▾")
      (defun ak-org-hooks ()
        (require 'org-tempo)
        (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -655,4 +655,9 @@ Display and insert emojis in emacs
 * Vterm
 #+begin_src emacs-lisp
 (use-package vterm :straight t)
+#+end_src
+
+* Telega
+#+begin_src emacs-lisp
+  (use-package telega :defer t)
 #+end_src
