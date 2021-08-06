@@ -4,39 +4,46 @@
 (add-hook 'after-change-major-mode-hook 'remove-scratch-buffer)
 
 (use-package ivy
-             :straight t
-               :bind (("C-s" . swiper)
-                      :map ivy-minibuffer-map
-                      ("TAB" . ivy-alt-done)
-                      ("M-TAB" . ivy-immediate-done)
-                      ("C-l" . ivy-alt-done)
-                      ("C-j" . ivy-next-line)
-                      ("C-k" . ivy-previous-line)
-                      :map ivy-switch-buffer-map
-                      ("C-k" . ivy-previous-line)
-                      ("C-l" . ivy-done)
-                      ("C-d" . ivy-switch-buffer-kill)
-                      :map ivy-reverse-i-search-map
-                      ("C-k" . ivy-previous-line)
-                      ("C-d" . ivy-reverse-i-search-kill))
-               :config
-               (ivy-mode 1))
-             (use-package counsel
-      :straight t
-        :bind (("M-x" . counsel-M-x)
-    ("<menu>" . counsel-M-x)
-               ("C-x b" . counsel-switch-buffer)
-               ("C-x C-f" . counsel-find-file)))
+  :straight t
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("M-TAB" . ivy-immediate-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
+    (use-package ivy-rich :after counsel
+  :straight t
+  :init
+  (ivy-rich-mode 1))
+(use-package counsel
+  :straight t
+  :bind (("M-x" . counsel-M-x)
+         ("<menu>" . counsel-M-x)
+         ("C-x b" . counsel-switch-buffer)
+         ("C-x C-f" . counsel-find-file)
+         :map minibuffer-local-map
+   ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (counsel-mode 1))
 
-        (use-package ivy-rich :after counsel
-        :straight t
-          :after ivy
-          :init
-          (ivy-rich-mode 1))
-(straight-use-package 'ivy-prescient)
-(ivy-prescient-mode t)
+(use-package ivy-prescient :after counsel
+  :custom
+  (ivy-prescient-enable-filtering nil)
+  :config
+  (prescient-persist-mode 1)
+  (ivy-prescient-mode t))
 
-(global-set-key (kbd "M-r") 'reload-config)
+(global-set-key (kbd "s-S-r") 'reload-config)
 (defun reload-config ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
@@ -322,12 +329,14 @@
   "Capture a TODO item"
   (org-capture nil "p"))
 
-(use-package vterm :straight nil)
+(use-package vterm :straight t)
       (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
                           ("find-file" find-file)
                           ("message" message)
                           ("vterm-clear-scrollback" vterm-clear-scrollback)))
 ;; (setq  vterm-always-compile-module nil)
+(use-package multi-vterm :straight t :defer t
+    :bind ("s-<return>" . multi-vterm))
 
 ;; Behave like vi's o command
 (defun open-next-line (arg)
@@ -463,10 +472,6 @@
     (define-key gif-screencast-mode-map (kbd "<f8>") 'gif-screencast-toggle-pause)
     (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
 (global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop)
-
-(use-package vterm :straight t :defer t)
-(use-package multi-vterm :straight t :defer t
-  :bind ("s-<return>" . multi-vterm))
 
 (use-package telega :defer t)
 

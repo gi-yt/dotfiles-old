@@ -14,44 +14,51 @@ These buffers are nothing but an annoyance
   I tried helm but the UI was not my taste
   I just got used to ivy
   #+begin_src emacs-lisp
-          (use-package ivy
-             :straight t
-               :bind (("C-s" . swiper)
-                      :map ivy-minibuffer-map
-                      ("TAB" . ivy-alt-done)
-                      ("M-TAB" . ivy-immediate-done)
-                      ("C-l" . ivy-alt-done)
-                      ("C-j" . ivy-next-line)
-                      ("C-k" . ivy-previous-line)
-                      :map ivy-switch-buffer-map
-                      ("C-k" . ivy-previous-line)
-                      ("C-l" . ivy-done)
-                      ("C-d" . ivy-switch-buffer-kill)
-                      :map ivy-reverse-i-search-map
-                      ("C-k" . ivy-previous-line)
-                      ("C-d" . ivy-reverse-i-search-kill))
-               :config
-               (ivy-mode 1))
-             (use-package counsel
+    (use-package ivy
       :straight t
-        :bind (("M-x" . counsel-M-x)
-    ("<menu>" . counsel-M-x)
-               ("C-x b" . counsel-switch-buffer)
-               ("C-x C-f" . counsel-find-file)))
-
+      :bind (("C-s" . swiper)
+             :map ivy-minibuffer-map
+             ("TAB" . ivy-alt-done)
+             ("M-TAB" . ivy-immediate-done)
+             ("C-l" . ivy-alt-done)
+             ("C-j" . ivy-next-line)
+             ("C-k" . ivy-previous-line)
+             :map ivy-switch-buffer-map
+             ("C-k" . ivy-previous-line)
+             ("C-l" . ivy-done)
+             ("C-d" . ivy-switch-buffer-kill)
+             :map ivy-reverse-i-search-map
+             ("C-k" . ivy-previous-line)
+             ("C-d" . ivy-reverse-i-search-kill))
+      :config
+      (ivy-mode 1))
         (use-package ivy-rich :after counsel
-        :straight t
-          :after ivy
-          :init
-          (ivy-rich-mode 1))
-(straight-use-package 'ivy-prescient)
-(ivy-prescient-mode t)
+      :straight t
+      :init
+      (ivy-rich-mode 1))
+    (use-package counsel
+      :straight t
+      :bind (("M-x" . counsel-M-x)
+             ("<menu>" . counsel-M-x)
+             ("C-x b" . counsel-switch-buffer)
+             ("C-x C-f" . counsel-find-file)
+             :map minibuffer-local-map
+       ("C-r" . 'counsel-minibuffer-history))
+      :config
+      (counsel-mode 1))
+
+    (use-package ivy-prescient :after counsel
+      :custom
+      (ivy-prescient-enable-filtering nil)
+      :config
+      (prescient-persist-mode 1)
+      (ivy-prescient-mode t))
 #+end_src
 
 * Config Reload
-  I know this is a horrible shortcut but i have gotten used to it
+  I know this is a horrible shortcut for emacs
   #+begin_src emacs-lisp
-(global-set-key (kbd "M-r") 'reload-config)
+(global-set-key (kbd "s-S-r") 'reload-config)
 (defun reload-config ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
@@ -466,13 +473,15 @@ Publish to my blog
 * Vterm
 My terminal of choice
   #+begin_src emacs-lisp
-    (use-package vterm :straight nil)
+    (use-package vterm :straight t)
       (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
                           ("find-file" find-file)
                           ("message" message)
                           ("vterm-clear-scrollback" vterm-clear-scrollback)))
 ;; (setq  vterm-always-compile-module nil)
-        #+end_src
+(use-package multi-vterm :straight t :defer t
+    :bind ("s-<return>" . multi-vterm))
+#+end_src
 
 * Newline
 As an ex-evil user this is very useful
@@ -650,13 +659,6 @@ Display and insert emojis in emacs
     (define-key gif-screencast-mode-map (kbd "<f8>") 'gif-screencast-toggle-pause)
     (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
 (global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop)
-#+end_src
-
-* Vterm
-#+begin_src emacs-lisp
-  (use-package vterm :straight t :defer t)
-  (use-package multi-vterm :straight t :defer t
-    :bind ("s-<return>" . multi-vterm))
 #+end_src
 
 * Telega
