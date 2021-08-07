@@ -287,7 +287,10 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
  for command in mount umount sv pacman updatedb su ; do
 	 alias $command="sudo $command"
  done; unset command
-
+# if tty | grep tty &> /dev/null
+# then
+#     sudo loadkeys ~/.config/X11/ttymaps.kmap
+#     fi
  # Verbosity and settings that you pretty much just always are going to want.
  alias \
 	 cp="cp -iv" \
