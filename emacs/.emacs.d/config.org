@@ -235,8 +235,8 @@ Very useful for selecting text
   #+begin_src emacs-lisp
 (use-package expand-region
   :straight t
-  :bind ("C-q" . er/expand-region))
-
+  :bind ("C-q" . er/expand-region)
+:defer t)
   #+end_src
 
 * ORG
@@ -331,7 +331,7 @@ I can't switch from doom-modeline
   #+end_src
 
 * Magit
-Git
+After using magit for a while, I can't use git cli for anythin other than adding and commiting everything.The diff feature is the killer feature imo.
   #+begin_src emacs-lisp
 (use-package magit :straight t :defer 0 :commands magit-status :custom  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
@@ -342,11 +342,10 @@ Animations for killing, pasting etc. etc.
 #+begin_src emacs-lisp
   (use-package goggles)
   (goggles-mode)
-
   #+end_src
 
 * Use local Emacs Instance as $EDITOR
-the $EDITOR Var
+the $EDITOR Var will be set such that it will open in the same instance of emacs
 #+begin_src emacs-lisp
   (use-package with-editor
   ;; Use local Emacs instance as $EDITOR (e.g. in `git commit' or `crontab -e')
@@ -355,21 +354,9 @@ the $EDITOR Var
   #+end_src)
 
 * ESUP
-Startup profiler
+Startup profiler. Very useful to check which packages are slowing my startup
   #+begin_src emacs-lisp
-(use-package esup)
-  #+end_src
-
-* Large Files
-  #+begin_src emacs-lisp
-    (use-package logview
-      :defer t
-      :config
-      (setq logview-additional-submodes
-            '(("Logback4me"
-               (format . "TIMESTAMP [THREAD] {} LEVEL NAME -")
-               (levels . "SLF4J")))))
-
+(use-package esup :defer t)
   #+end_src
 
 * Scratch
@@ -473,7 +460,7 @@ Publish to my blog
 * Vterm
 My terminal of choice
   #+begin_src emacs-lisp
-    (use-package vterm :straight t)
+    (use-package vterm :straight t :defer t)
       (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
                           ("find-file" find-file)
                           ("message" message)
@@ -485,6 +472,7 @@ My terminal of choice
 
 * Newline
 As an ex-evil user this is very useful
+This allows me to create a newline like vi commands o and O
   #+begin_src emacs-lisp
 ;; Behave like vi's o command
 (defun open-next-line (arg)
@@ -595,7 +583,6 @@ comment and unhcomment with ease
 (use-package evil-nerd-commenter
   :straight t
   :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
   #+end_src
 
 * AutoSave
@@ -654,11 +641,11 @@ Display and insert emojis in emacs
 
 * GIF
 #+begin_src emacs-lisp
-    (use-package gif-screencast)
+    (use-package gif-screencast :defer t :config
   (with-eval-after-load 'gif-screencast
     (define-key gif-screencast-mode-map (kbd "<f8>") 'gif-screencast-toggle-pause)
     (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
-(global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop)
+(global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop))
 #+end_src
 
 * Telega

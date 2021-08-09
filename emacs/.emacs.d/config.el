@@ -165,7 +165,8 @@
 
 (use-package expand-region
   :straight t
-  :bind ("C-q" . er/expand-region))
+  :bind ("C-q" . er/expand-region)
+:defer t)
 
 (setq org-ellipsis "▾")
 (defun ak-org-hooks ()
@@ -241,15 +242,7 @@
 (use-package goggles)
 (goggles-mode)
 
-(use-package esup)
-
-(use-package logview
-  :defer t
-  :config
-  (setq logview-additional-submodes
-        '(("Logback4me"
-           (format . "TIMESTAMP [THREAD] {} LEVEL NAME -")
-           (levels . "SLF4J")))))
+(use-package esup :defer t)
 
 (defun xah-new-empty-buffer ()
       "Create a new empty buffer.
@@ -329,7 +322,7 @@
   "Capture a TODO item"
   (org-capture nil "p"))
 
-(use-package vterm :straight t)
+(use-package vterm :straight t :defer t)
       (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
                           ("find-file" find-file)
                           ("message" message)
@@ -467,11 +460,11 @@
 (use-package kdeconnect
   :defer t)
 
-(use-package gif-screencast)
+(use-package gif-screencast :defer t :config
   (with-eval-after-load 'gif-screencast
     (define-key gif-screencast-mode-map (kbd "<f8>") 'gif-screencast-toggle-pause)
     (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
-(global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop)
+(global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop))
 
 (use-package telega :defer t)
 
