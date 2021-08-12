@@ -11,6 +11,7 @@
 :after (company company-box)
 :commands (lsp lsp-deferred)
 :hook (lsp-mode . efs/lsp-mode-setup)
+(lsp-mode . company-mode)
 :init
 (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
 :config
@@ -56,27 +57,29 @@
                         company-dabbrev-code
                         company-capf
                         company-yasnippet)))))
+(use-package sh-mode :straight nil
+  :hook (sh-mode . lsp-deferred))
 
 (use-package web-mode
   :mode "(\\.\\(html?\\|ejs\\|tsx\\|jsx\\)\\'"
+  :hook (web-mode . lsp-deferred)
   :config
   (setq-default web-mode-code-indent-offset 2)
   (setq-default web-mode-markup-indent-offset 2)
   (setq-default web-mode-attribute-indent-offset 2))
 
-;; 1. Start the server with `httpd-start'
-;; 2. Use `impatient-mode' on any buffer
 (use-package impatient-mode :hook (web-mode . impatient-mode))
 
 (use-package rust-mode
   :mode "\\.rs\\'"
+:hook (rust-mode . lsp-deferred)
   :init (setq rust-format-on-save t))
 
 (use-package cargo
   :defer t)
 
-(add-hook 'c-mode-hook 'lsp)
-(add-hook 'c++-mode-hook 'lsp)
+(add-hook 'c-mode-hook 'lsp-deferred)
+(add-hook 'c++-mode-hook 'lsp-deferred)
   (defun auto-recompile-buffer ()
 (interactive)
 (if (member #'recompile after-save-hook)

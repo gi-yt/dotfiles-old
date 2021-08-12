@@ -137,7 +137,6 @@
  read-process-output-max (* 1024 1024)            ; Increase the amount of data reads from the process
  select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
  tab-width 4                                      ; Set width for tabs
- vc-follow-symlinks t                             ; Always follow the symlinks
  view-read-only t)                                ; Always open read-only buffers in view-mode
 (cd "~/")                                         ; Move to the user directory
 (column-number-mode 1)                            ; Show the column number

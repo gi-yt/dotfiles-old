@@ -1,6 +1,9 @@
 xrdb merge ~/.config/X11/Xresources &
 gpg-connect-agent /bye &
 autorandr -c
-setxkbmap -option caps:backspace
-# exec xmonad
-exec emacs -mm
+dm-setbg -i &
+~/.bin/setkeys &
+dwmblocks &
+emacs --daemon &
+sxhkd &
+exec dwm

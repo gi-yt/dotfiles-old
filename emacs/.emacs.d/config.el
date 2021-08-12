@@ -271,56 +271,58 @@
   :config (global-hungry-delete-mode))
 
 (use-package org-roam ;; Package is on melpa
-               :straight t
-           :defer t
-               :custom
-             (make-directory "~/org-roam") ;; The dir all notes are gonna be stored
-             (setq org-roam-directory (file-truename "~/org-roam"))
-             :bind (("C-c n l" . org-roam-buffer-toggle) ;; Binds
-                    ("C-c n f" . org-roam-node-find)
-                    ("C-c n g" . org-roam-graph) ;; Graph i was talking about.
-                    ("C-c n i" . org-roam-node-insert)
-                    ("C-c n c" . org-roam-capture)
-                    ;; Dailies
-                    ("C-c n j" . org-roam-dailies-capture-today))
-             :config
-             ;; If using org-roam-protocol
-             (require 'org-roam-protocol)
-             ;; (use-package org-roam-server) ;; There is server but havent gotten it  to work yet
-             ;; (setq org-roam-server-host "127.0.0.1"
-             ;;       org-roam-server-port 8080
-             ;;       org-roam-server-authenticate t
-             ;;       org-roam-server-export-inline-images t
-             ;;       org-roam-server-serve-files t
-             ;;       org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
-             ;;       org-roam-server-network-poll t
-             ;;       org-roam-server-network-arrows nil
-             ;;       org-roam-server-network-label-truncate t
-             ;;       org-roam-server-network-label-truncate-length 60
-             ;;       org-roam-server-network-label-wrap-length 20)
-         (add-to-list 'display-buffer-alist
-                      '("\\*org-roam\\*"
-                        (display-buffer-in-direction)
-                        (direction . right)
-                        (window-width . 0.33)
-                        (window-height . fit-window-to-buffer)))
-         (setq org-roam-completion-everywhere t)
-         (org-roam-setup))
-(setq org-roam-v2-ack t)
+                   :straight t
+               :defer t
+                   :custom
+                 (make-directory "~/org-roam") ;; The dir all notes are gonna be stored
+                 (setq org-roam-directory (file-truename "~/org-roam"))
+                 :bind (("C-c n l" . org-roam-buffer-toggle) ;; Binds
+                        ("C-c n f" . org-roam-node-find)
+                        ("C-c n g" . org-roam-graph) ;; Graph i was talking about.
+                        ("C-c n i" . org-roam-node-insert)
+                        ("C-c n c" . org-roam-capture)
+                        ;; Dailies
+                        ("C-c n j" . org-roam-dailies-capture-today))
+                 :config
+                 ;; If using org-roam-protocol
+                 (require 'org-roam-protocol)
+(use-package org-roam-ui
+  :straight
+    (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+    :after org-roam
+    :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+                 (add-to-list 'display-buffer-alist
+                          '("\\*org-roam\\*"
+                            (display-buffer-in-direction)
+                            (direction . right)
+                            (window-width . 0.33)
+                            (window-height . fit-window-to-buffer)))
+             (setq org-roam-completion-everywhere t)
+             (org-roam-setup))
+    (setq org-roam-v2-ack t)
 
-(defun create-blog-post ()
-  "Create an org file in ~/source/myblog/posts."
-  (interactive)
-  (let ((name (read-string "Filename: ")))
-    (expand-file-name (format "%s.org" name) "~/fossnix/posts")))
-(defun blog-publish ()
-  (interactive)
-  (cd "~/fossnix")
-  (async-shell-command "make publish && git add -A && git commit -a -m New && git push"))
-(defun blog-post ()
-  (interactive)
-  "Capture a TODO item"
-  (org-capture nil "p"))
+(setq org-capture-templates
+        '(("p" "Post" plain
+                (file create-blog-post)
+                (file "~/website/org-templates/post.orgcaptmpl"))))
+    (defun create-blog-post ()
+      "Create an org file in ~/source/myblog/posts."
+      (interactive)
+      (let ((name (read-string "Filename: ")))
+        (expand-file-name (format "%s.org" name) "~/website/posts")))
+    (defun blog-publish ()
+      (interactive)
+      (cd "~/fossnix")
+      (async-shell-command "make publish && git add -A && git commit -a -m New && git push"))
+    (defun blog-post ()
+      (interactive)
+      "Capture a TODO item"
+      (org-capture nil "p"))
 
 (use-package vterm :straight t :defer t)
       (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
@@ -474,211 +476,9 @@
   (edwina-setup-dwm-keys)
   (edwina-mode 1))
 
-(defun efs/run-in-background (command)
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
-
-(defun efs/exwm-init-hook ()
-  ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
-
-  ;; Open eshell by default
-  ;;(eshell)
-
-  ;; NOTE: The next two are disabled because we now use Polybar!
-
-  ;; Show battery status in the mode line
-  ;;(display-battery-mode 1)
-
-  ;; Show the time and date in modeline
-  ;;(setq display-time-day-and-date t)
-  ;;(display-time-mode 1)
-  ;; Also take a look at display-time-format and format-time-string
-
-  ;; Start the Polybar panel
-  ;; (efs/start-panel)
-
-  ;; Launch apps that will run in the background
-  (efs/run-in-background "dunst")
-  (efs/run-in-background "flameshot")
-  (efs/run-in-background "pasystray")
-  (efs/run-in-background "blueman-applet"))
-
-(defun efs/exwm-update-class ()
-  (exwm-workspace-rename-buffer exwm-class-name))
-
-(defun efs/exwm-update-title ()
-  (pcase exwm-class-name
-    ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))))
-
-;; This function isn't currently used, only serves as an example how to
-;; position a window
-(defun efs/position-window ()
-  (let* ((pos (frame-position))
-         (pos-x (car pos))
-          (pos-y (cdr pos)))
-
-    (exwm-floating-move (- pos-x) (- pos-y))))
-
-(defun efs/configure-window-by-class ()
-  (interactive)
-  (pcase exwm-class-name
-    ("Firefox" (exwm-workspace-move-window 2))
-    ("Sol" (exwm-workspace-move-window 3))
-    ("mpv" (exwm-floating-toggle-floating)
-           (exwm-layout-toggle-mode-line))))
-
-(use-package exwm
-  :config
-  ;; Set the default number of workspaces
-  (setq exwm-workspace-number 5)
-
-  ;; When window "class" updates, use it to set the buffer name
-  (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
-
-  ;; When window title updates, use it to set the buffer name
-  (add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
-
-  ;; Configure windows as they're created
-  (add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
-
-  ;; When EXWM starts up, do some extra confifuration
-  (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
-
-  ;; NOTE: Uncomment the following two options if you want window buffers
-  ;;       to be available on all workspaces!
-
-  ;; Automatically move EXWM buffer to current workspace when selected
-  ;; (setq exwm-layout-show-all-buffers t)
-
-  ;; Display all EXWM buffers in every workspace buffer list
-  ;; (setq exwm-workspace-show-all-buffers t)
-
-  ;; NOTE: Uncomment this option if you want to detach the minibuffer!
-  ;; Detach the minibuffer (show it with exwm-workspace-toggle-minibuffer)
-  ;;(setq exwm-workspace-minibuffer-position 'top)
-
-  ;; This will need to be updated to the name of a display!  You can find
-  ;; the names of your displays by looking at arandr or the output of xrandr
-  ;; NOTE: Uncomment these lines after setting up autorandr!
-  ;; React to display connectivity changes, do initial display update
-  ;; (add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
-  ;; (efs/update-displays)
-
-  ;; NOTE: This is disabled because we now use Polybar!
-  ;; Load the system tray before exwm-init
-  ;; (require 'exwm-systemtray)
-  ;; (setq exwm-systemtray-height 32)
-  ;; (exwm-systemtray-enable)
-
-  ;; Automatically send the mouse cursor to the selected workspace's display
-  (setq exwm-workspace-warp-cursor t)
-
-  ;; Window focus should follow the mouse pointer
-  (setq mouse-autoselect-window t
-        focus-follows-mouse t)
-
-  ;; These keys should always pass through to Emacs
-  (setq exwm-input-prefix-keys
-    '(?\C-x
-      ?\C-u
-      ?\C-h
-      ?\M-x
-      ?\M-`
-      ?\M-&
-      ?\M-:
-      ?\C-\M-j  ;; Buffer list
-      ?\C-\ ))  ;; Ctrl+Space
-
-  ;; Ctrl+Q will enable the next key to be sent directly
-  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-
-  ;; Set up global key bindings.  These always work, no matter the input state!
-  ;; Keep in mind that changing this list after EXWM initializes has no effect.
-  (setq exwm-input-global-keys
-        `(
-          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-          ([?\s-r] . exwm-reset)
-
-          ;; Move between windows
-          ([s-left] . windmove-left)
-          ([s-right] . windmove-right)
-          ([s-up] . windmove-up)
-          ([s-down] . windmove-down)
-
-          ;; Launch applications via shell command
-          ([?\s-&] . (lambda (command)
-                       (interactive (list (read-shell-command "$ ")))
-                       (start-process-shell-command command nil command)))
-
-          ;; Switch workspace
-          ([?\s-w] . exwm-workspace-switch)
-          ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
-
-          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-          ,@(mapcar (lambda (i)
-                      `(,(kbd (format "s-%d" i)) .
-                        (lambda ()
-                          (interactive)
-                          (exwm-workspace-switch-create ,i))))
-                    (number-sequence 0 9))))
-
-  (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-
-  (exwm-enable))
-
-(use-package desktop-environment
-  :after exwm
-  :config (desktop-environment-mode)
-  :custom
-  (desktop-environment-brightness-small-increment "2%+")
-  (desktop-environment-brightness-small-decrement "2%-")
-  (desktop-environment-brightness-normal-increment "5%+")
-  (desktop-environment-brightness-normal-decrement "5%-"))
-
-;; Make sure the server is started (better to do this in your main Emacs config!)
-(server-start)
-
-(defvar efs/polybar-process nil
-  "Holds the process of the running Polybar instance, if any")
-
-(defun efs/kill-panel ()
-  (interactive)
-  (when efs/polybar-process
-    (ignore-errors
-      (kill-process efs/polybar-process)))
-  (setq efs/polybar-process nil))
-
-(defun efs/start-panel ()
-  (interactive)
-  (efs/kill-panel)
-  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
-
-(defun efs/send-polybar-hook (module-name hook-index)
-  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
-
-(defun efs/send-polybar-exwm-workspace ()
-  (efs/send-polybar-hook "exwm-workspace" 1))
-
-;; Update panel indicator when workspace changes
-(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
-
-(use-package eaf
-:straight nil
-  :load-path "~/.emacs.d/site-lisp/emacs-application-framework" ; Set to "/usr/share/emacs/site-lisp/eaf" if installed from AUR
-  :init
-  (use-package epc :defer t :ensure t)
-  (use-package ctable :defer t :ensure t)
-  (use-package deferred :defer t :ensure t)
-  (use-package s :defer t :ensure t)
-  :custom
-  (eaf-browser-continue-where-left-off t)
-  :config
-  (setq eaf-browser-enable-adblocker t)
-  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
+(use-package toc-org
+:hook (org-mode . toc-org-mode)
+    )
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 
