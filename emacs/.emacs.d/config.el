@@ -169,29 +169,30 @@
 :defer t)
 
 (setq org-ellipsis "▾")
-          (defun ak-org-hooks ()
-            (require 'org-tempo)
-            (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-            (add-to-list 'org-structure-template-alist '("py" . "src python"))
-            (add-to-list 'org-structure-template-alist '("sh" . "src bash"))
-            (org-babel-do-load-languages
-             'org-babel-load-languages
-             '((emacs-lisp . t)
-               (python . t)))
-               (org-indent-mode 1)
-               )
-     (defun up-n-fold ()
-       (interactive)
-        (progn
-          (outline-previous-visible-heading 1)
-          (org-cycle)))
-          ;; (add-hook 'org-mode-hook 'ak-org-hooks)
-          (use-package org
-            :straight nil
-            :bind (:map org-mode-map
-("<C-tab>" . up-n-fold)
-                   )
-            :hook (org-mode . ak-org-hooks))
+             (defun ak-org-hooks ()
+               (require 'org-tempo)
+               (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+               (add-to-list 'org-structure-template-alist '("py" . "src python"))
+               (add-to-list 'org-structure-template-alist '("sh" . "src bash"))
+(setq org-hide-emphasis-markers t)
+               (org-babel-do-load-languages
+                'org-babel-load-languages
+                '((emacs-lisp . t)
+                  (python . t)))
+                  (org-indent-mode 1)
+                  )
+        (defun up-n-fold ()
+          (interactive)
+           (progn
+             (outline-previous-visible-heading 1)
+             (org-cycle)))
+             ;; (add-hook 'org-mode-hook 'ak-org-hooks)
+             (use-package org
+               :straight nil
+               :bind (:map org-mode-map
+   ("<C-tab>" . up-n-fold)
+                      )
+               :hook (org-mode . ak-org-hooks))
 
 (use-package org-bullets
 :straight t
@@ -559,6 +560,11 @@ Version 2018-09-10"
             (copy-region-as-kill (line-beginning-position) (line-end-position))
             (end-of-line)
             (forward-char)))))))
+
+(use-package org-krita
+  :straight (:host github
+           :repo "lepisma/org-krita"
+           :files ("resources" "resources" "*.el" "*.el")))
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 
