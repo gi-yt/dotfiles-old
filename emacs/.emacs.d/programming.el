@@ -39,10 +39,10 @@
               (use-package company-box
               :straight t
             :hook (company-mode . company-box-mode))
-        (use-package company-quickhelp :ensure t :after company :hook (company-mode . company-quickhelp-mode))
+        (use-package company-quickhelp :ensure t :after company :hook (company-mode . company-quickhelp-mode) :defer t)
 
 (use-package python-mode
-  :straight t
+  :straight nil
   :mode ("\\.py\\'")
   :hook (python-mode . lsp-deferred))
         (use-package py-autopep8 :straight t :hook (python-mode . py-autopep8-enable-on-save))
@@ -86,7 +86,7 @@
     (remove-hook 'after-save-hook #'recompile t)
   (add-hook 'after-save-hook #'recompile nil t)))
 
-(use-package flycheck :straight t :hook (prog-mode . flycheck-mode))
+(use-package flycheck :straight t :hook (prog-mode . flycheck-mode) :defer t)
 
 (use-package markdown-mode
   :straight t

@@ -6,4 +6,6 @@ dm-setbg -i &
 dwmblocks &
 emacs --daemon &
 sxhkd &
+pipewire &
+pipewire-pulse &
 exec dwm

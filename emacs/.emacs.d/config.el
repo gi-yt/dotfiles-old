@@ -169,21 +169,29 @@
 :defer t)
 
 (setq org-ellipsis "▾")
-(defun ak-org-hooks ()
-  (require 'org-tempo)
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("py" . "src python"))
-  (add-to-list 'org-structure-template-alist '("sh" . "src bash"))
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (python . t)))
-     (org-indent-mode 1)
-     )
-;; (add-hook 'org-mode-hook 'ak-org-hooks)
-(use-package org
-  :straight nil
-  :hook (org-mode . ak-org-hooks))
+          (defun ak-org-hooks ()
+            (require 'org-tempo)
+            (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+            (add-to-list 'org-structure-template-alist '("py" . "src python"))
+            (add-to-list 'org-structure-template-alist '("sh" . "src bash"))
+            (org-babel-do-load-languages
+             'org-babel-load-languages
+             '((emacs-lisp . t)
+               (python . t)))
+               (org-indent-mode 1)
+               )
+     (defun up-n-fold ()
+       (interactive)
+        (progn
+          (outline-previous-visible-heading 1)
+          (org-cycle)))
+          ;; (add-hook 'org-mode-hook 'ak-org-hooks)
+          (use-package org
+            :straight nil
+            :bind (:map org-mode-map
+("<C-tab>" . up-n-fold)
+                   )
+            :hook (org-mode . ak-org-hooks))
 
 (use-package org-bullets
 :straight t
@@ -237,7 +245,7 @@
 ;; (use-package doom-themes :straight t :init (load-theme 'doom-dracula))
 (use-package atom-one-dark-theme :straight t :init (load-theme 'atom-one-dark))
 
-(use-package magit :straight t :defer 0 :commands magit-status :custom  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+(use-package magit :straight t :defer t :commands magit-status :custom  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
 (use-package goggles)
 (goggles-mode)
@@ -271,40 +279,30 @@
   :config (global-hungry-delete-mode))
 
 (use-package org-roam ;; Package is on melpa
-                   :straight t
-               :defer t
-                   :custom
-                 (make-directory "~/org-roam") ;; The dir all notes are gonna be stored
-                 (setq org-roam-directory (file-truename "~/org-roam"))
-                 :bind (("C-c n l" . org-roam-buffer-toggle) ;; Binds
-                        ("C-c n f" . org-roam-node-find)
-                        ("C-c n g" . org-roam-graph) ;; Graph i was talking about.
-                        ("C-c n i" . org-roam-node-insert)
-                        ("C-c n c" . org-roam-capture)
-                        ;; Dailies
-                        ("C-c n j" . org-roam-dailies-capture-today))
-                 :config
-                 ;; If using org-roam-protocol
-                 (require 'org-roam-protocol)
-(use-package org-roam-ui
-  :straight
-    (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
-    :after org-roam
-    :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
-                 (add-to-list 'display-buffer-alist
-                          '("\\*org-roam\\*"
-                            (display-buffer-in-direction)
-                            (direction . right)
-                            (window-width . 0.33)
-                            (window-height . fit-window-to-buffer)))
-             (setq org-roam-completion-everywhere t)
-             (org-roam-setup))
-    (setq org-roam-v2-ack t)
+               :straight t
+           :defer t
+               :custom
+             (make-directory "~/org-roam") ;; The dir all notes are gonna be stored
+             (setq org-roam-directory (file-truename "~/org-roam"))
+             :bind (("C-c n l" . org-roam-buffer-toggle) ;; Binds
+                    ("C-c n f" . org-roam-node-find)
+                    ("C-c n g" . org-roam-graph) ;; Graph i was talking about.
+                    ("C-c n i" . org-roam-node-insert)
+                    ("C-c n c" . org-roam-capture)
+                    ;; Dailies
+                    ("C-c n j" . org-roam-dailies-capture-today))
+             :config
+             ;; If using org-roam-protocol
+             (require 'org-roam-protocol)
+             (add-to-list 'display-buffer-alist
+                      '("\\*org-roam\\*"
+                        (display-buffer-in-direction)
+                        (direction . right)
+                        (window-width . 0.33)
+                        (window-height . fit-window-to-buffer)))
+         (setq org-roam-completion-everywhere t)
+         (org-roam-setup))
+(setq org-roam-v2-ack t)
 
 (setq org-capture-templates
         '(("p" "Post" plain
@@ -317,7 +315,7 @@
         (expand-file-name (format "%s.org" name) "~/website/posts")))
     (defun blog-publish ()
       (interactive)
-      (cd "~/fossnix")
+      (cd "~/website")
       (async-shell-command "make publish && git add -A && git commit -a -m New && git push"))
     (defun blog-post ()
       (interactive)
@@ -470,15 +468,97 @@
 
 (use-package telega :defer t)
 
-(use-package edwina
-  :config
-  (setq display-buffer-base-action '(display-buffer-below-selected))
-  (edwina-setup-dwm-keys)
-  (edwina-mode 1))
-
 (use-package toc-org
 :hook (org-mode . toc-org-mode)
     )
+
+;; Install `plz' HTTP library (not on MELPA yet).
+(use-package plz
+  :straight '(plz :host github :repo "alphapapa/plz.el")
+  :defer t)
+
+;; Install Ement.
+(use-package ement
+  :straight '(ement :host github :repo "alphapapa/ement.el")
+  :defer t)
+
+(use-package edit-server
+  :straight t
+  :commands edit-server-start
+  :init (if after-init-time
+              (edit-server-start)
+            (add-hook 'after-init-hook
+                      #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '((name . "Edit with Emacs FRAME")
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t)
+                  (window-system . x))))
+
+;; make cursor movement keys under right hand's home-row.
+  (global-set-key (kbd "M-i") 'previous-line)
+  (global-set-key (kbd "M-j") 'backward-char)
+  (global-set-key (kbd "M-k") 'next-line)
+  (global-set-key (kbd "M-l") 'forward-char)
+
+  (global-set-key (kbd "M-u") 'backward-word)
+  (global-set-key (kbd "M-o") 'forward-word)
+
+  (global-set-key (kbd "M-SPC") 'set-mark-command)
+
+  (defun xah-cut-line-or-region ()
+  "Cut current line, or text selection.
+When `universal-argument' is called first, cut whole buffer (respects `narrow-to-region').
+
+URL `http://ergoemacs.org/emacs/emacs_copy_cut_current_line.html'
+Version 2015-06-10"
+  (interactive)
+  (if current-prefix-arg
+      (progn ; not using kill-region because we don't want to include previous kill
+        (kill-new (buffer-string))
+        (delete-region (point-min) (point-max)))
+    (progn (if (use-region-p)
+               (kill-region (region-beginning) (region-end) t)
+             (kill-region (line-beginning-position) (line-beginning-position 2))))))
+(defun xah-copy-line-or-region ()
+  "Copy current line, or text selection.
+When called repeatedly, append copy subsequent lines.
+When `universal-argument' is called first, copy whole buffer (respects `narrow-to-region').
+
+URL `http://ergoemacs.org/emacs/emacs_copy_cut_current_line.html'
+Version 2018-09-10"
+  (interactive)
+  (if current-prefix-arg
+      (progn
+        (copy-region-as-kill (point-min) (point-max)))
+    (if (use-region-p)
+        (progn
+          (copy-region-as-kill (region-beginning) (region-end)))
+      (if (eq last-command this-command)
+          (if (eobp)
+              (progn )
+            (progn
+              (kill-append "\n" nil)
+              (kill-append
+               (buffer-substring-no-properties (line-beginning-position) (line-end-position))
+               nil)
+              (progn
+                (end-of-line)
+                (forward-char))))
+        (if (eobp)
+            (if (eq (char-before) 10 )
+                (progn )
+              (progn
+                (copy-region-as-kill (line-beginning-position) (line-end-position))
+                (end-of-line)))
+          (progn
+            (copy-region-as-kill (line-beginning-position) (line-end-position))
+            (end-of-line)
+            (forward-char)))))))
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 

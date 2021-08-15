@@ -1,8 +1,13 @@
 [user]
 	email = aryakiran@zohomail.eu
 	name = Arya Kiran
+	signingkey = F17E941C3818817A
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !/usr/bin/gh auth git-credential
 [credential]
 	helper = store
+[commit]
+    gpgsign = true
+[gpg]
+	program = gpg2

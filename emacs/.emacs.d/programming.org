@@ -16,6 +16,7 @@
 
       (use-package lsp-mode
       :straight t
+      :defer t
     :after (company company-box)
     :commands (lsp lsp-deferred)
     :hook (lsp-mode . efs/lsp-mode-setup)
@@ -49,12 +50,12 @@
                 (use-package company-box
                 :straight t
               :hook (company-mode . company-box-mode))
-          (use-package company-quickhelp :ensure t :after company :hook (company-mode . company-quickhelp-mode))
+          (use-package company-quickhelp :ensure t :after company :hook (company-mode . company-quickhelp-mode) :defer t)
 #+end_src
 * Python
 #+begin_src elisp
   (use-package python-mode
-    :straight t
+    :straight nil
     :mode ("\\.py\\'")
     :hook (python-mode . lsp-deferred))
           (use-package py-autopep8 :straight t :hook (python-mode . py-autopep8-enable-on-save))
@@ -116,7 +117,7 @@
 
 * FlyCheck
   #+begin_src emacs-lisp
-  (use-package flycheck :straight t :hook (prog-mode . flycheck-mode))
+  (use-package flycheck :straight t :hook (prog-mode . flycheck-mode) :defer t)
   #+end_src
 * MarkDown
   #+begin_src emacs-lisp
