@@ -143,7 +143,7 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
  alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
 
  # Merge Xresources
- alias merge='xrdb -merge ~/.Xresources'
+ alias merge='xrdb -merge ~/.config/X11/Xresources'
 
  # git
  alias addup='git add -u'
