@@ -43,7 +43,7 @@
   (prescient-persist-mode 1)
   (ivy-prescient-mode t))
 
-(global-set-key (kbd "s-S-r") 'reload-config)
+(global-set-key (kbd "s-r") 'reload-config)
 (defun reload-config ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
@@ -90,6 +90,10 @@
   :after org
   :hook (org-mode . org-bullets-mode))
 
+(use-package toc-org :defer t
+:hook (org-mode . toc-org-mode)
+    )
+
 (use-package which-key
   :init
   (setq which-key-side-window-location 'bottom
@@ -131,7 +135,10 @@
   (doom-modeline-gnus-timer nil))
 
 ;; (use-package doom-themes :straight t :init (load-theme 'doom-dracula))
-(use-package atom-one-dark-theme :straight t :init (load-theme 'atom-one-dark))
+
+(if (display-graphic-p)
+    (use-package atom-one-dark-theme :straight t :init (load-theme 'atom-one-dark))
+  (load-theme 'tsdh-dark))
 
 (use-package magit :straight t :defer t :commands magit-status :custom  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
@@ -332,26 +339,9 @@
 
 (use-package telega :defer t)
 
-(use-package toc-org
-:hook (org-mode . toc-org-mode)
-    )
-
-(use-package edit-server
-  :straight t
-  :commands edit-server-start
-  :init (if after-init-time
-              (edit-server-start)
-            (add-hook 'after-init-hook
-                      #'(lambda() (edit-server-start))))
-  :config (setq edit-server-new-frame-alist
-                '((name . "Edit with Emacs FRAME")
-                  (top . 200)
-                  (left . 200)
-                  (width . 80)
-                  (height . 25)
-                  (minibuffer . t)
-                  (menu-bar-lines . t)
-                  (window-system . x))))
+(use-package org-auto-tangle
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode))
 
 ;; make cursor movement keys under right hand's home-row.
   (global-set-key (kbd "C-i ") 'previous-line)
@@ -413,6 +403,22 @@ Version 2018-09-10"
             (copy-region-as-kill (line-beginning-position) (line-end-position))
             (end-of-line)
             (forward-char)))))))
+
+(setq x-select-enable-clipboard t)
+(defun xsel-cut-function (text &optional push)
+  (with-temp-buffer
+    (insert text)
+    (call-process-region (point-min) (point-max) "xsel" nil 0 nil "--clipboard" "--input")))
+(defun xsel-paste-function()
+
+  (let ((xsel-output (shell-command-to-string "xsel --clipboard --output")))
+    (unless (string= (car kill-ring) xsel-output)
+      xsel-output )))
+(setq interprogram-cut-function 'xsel-cut-function)
+(setq interprogram-paste-function 'xsel-paste-function)
+
+(global-set-key [(control ?h)] 'delete-backward-char)
+(keyboard-translate ?\C-h ?\C-?)
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 

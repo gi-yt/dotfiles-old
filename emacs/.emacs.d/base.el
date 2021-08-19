@@ -5,27 +5,6 @@
 (setq auto-window-vscroll nil)
 (fset 'yes-or-no-p 'y-or-n-p)
 (global-hl-line-mode +1)
-;; configure straight.el
-(setq
- ;; avoid checking packages on startup to speed it up
- straight-check-for-modifications '(check-on-save)
- ;; put all autoloads into a single file
- straight-cache-autoloads t)
-
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
 
 ;; Silence compiler warnings as they can be pretty disruptive
 ;; (setq native-comp-async-report-warnings-errors nil)
@@ -144,18 +123,3 @@
 (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
 (show-paren-mode 1)                               ; Show the parent
 (setq large-file-warning-threshold nil)
-(use-package org-auto-tangle
-  :defer t
-  :hook (org-mode . org-auto-tangle-mode))
-(defun toggle-transparency ()
-  (interactive)
-  (let ((alpha (frame-parameter nil 'alpha)))
-    (set-frame-parameter
-     nil 'alpha
-     (if (eql (cond ((numberp alpha) alpha)
-                    ((numberp (cdr alpha)) (cdr alpha))
-                    ;; Also handle undocumented (<active> <inactive>) form.
-                    ((numberp (cadr alpha)) (cadr alpha)))
-              100)
-         '(90 . 50) '(100 . 100)))))
-(global-set-key (kbd "C-c t") 'toggle-transparency)

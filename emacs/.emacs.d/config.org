@@ -14,6 +14,8 @@
 - [[#org][ORG]]
   - [[#additions][Additions]]
   - [[#ui][UI]]
+  - [[#org-toc][ORG TOC]]
+  - [[#org-auto-tangle][ORG Auto-Tangle]]
 - [[#which-key][Which Key]]
 - [[#modeline][Modeline]]
 - [[#theme][Theme]]
@@ -36,9 +38,10 @@
 - [[#discover-a-modes-keybindings][Discover a mode's keybindings]]
 - [[#dired][Dired]]
 - [[#telega][Telega]]
-- [[#org-toc][ORG TOC]]
-- [[#chrome-on-emacs][Chrome on emacs]]
 - [[#better-binds-thanks-ergoemacs][Better Binds (Thanks Ergoemacs)]]
+- [[#emacs-terminal-improvements][Emacs terminal improvements]]
+  - [[#x-clipboard-in-emacs-terminal][X Clipboard in emacs terminal]]
+  - [[#delet-key][Delet Key]]
 
 * Remove Junk Buffers
 These buffers are nothing but an annoyance
@@ -96,7 +99,7 @@ These buffers are nothing but an annoyance
 * Config Reload
   I know this is a horrible shortcut for emacs
   #+begin_src emacs-lisp
-(global-set-key (kbd "s-S-r") 'reload-config)
+(global-set-key (kbd "s-r") 'reload-config)
 (defun reload-config ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
@@ -182,6 +185,13 @@ Very useful for selecting text
   :hook (org-mode . org-bullets-mode))
    #+end_src
 
+** ORG TOC
+#+begin_src emacs-lisp
+  (use-package toc-org :defer t
+:hook (org-mode . toc-org-mode)
+    )
+#+end_src
+** ORG Auto-Tangle
 * Which Key
 Key previews
   #+begin_src emacs-lisp
@@ -233,8 +243,11 @@ I can't switch from doom-modeline
 
 * Theme
   #+begin_src emacs-lisp
-       ;; (use-package doom-themes :straight t :init (load-theme 'doom-dracula))
-       (use-package atom-one-dark-theme :straight t :init (load-theme 'atom-one-dark))
+    ;; (use-package doom-themes :straight t :init (load-theme 'doom-dracula))
+
+    (if (display-graphic-p)
+        (use-package atom-one-dark-theme :straight t :init (load-theme 'atom-one-dark))
+      (load-theme 'tsdh-dark))
   #+end_src
 
 * Magit
@@ -523,34 +536,11 @@ Display and insert emojis in emacs
   (use-package telega :defer t)
 #+end_src
 
-* ORG TOC
 #+begin_src emacs-lisp
-  (use-package toc-org
-:hook (org-mode . toc-org-mode)
-    )
+(use-package org-auto-tangle
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode))
 #+end_src
-
-* Chrome on emacs
-#+begin_src emacs-lisp
-(use-package edit-server
-  :straight t
-  :commands edit-server-start
-  :init (if after-init-time
-              (edit-server-start)
-            (add-hook 'after-init-hook
-                      #'(lambda() (edit-server-start))))
-  :config (setq edit-server-new-frame-alist
-                '((name . "Edit with Emacs FRAME")
-                  (top . 200)
-                  (left . 200)
-                  (width . 80)
-                  (height . 25)
-                  (minibuffer . t)
-                  (menu-bar-lines . t)
-                  (window-system . x))))
-
-#+end_src
-
 * Better Binds (Thanks Ergoemacs)
 #+begin_src emacs-lisp
     ;; make cursor movement keys under right hand's home-row.
@@ -613,5 +603,30 @@ Display and insert emojis in emacs
               (copy-region-as-kill (line-beginning-position) (line-end-position))
               (end-of-line)
               (forward-char)))))))
+
+#+end_src
+
+* Emacs terminal improvements
+** X Clipboard in emacs terminal
+#+begin_src emacs-lisp
+                (setq x-select-enable-clipboard t)
+                (defun xsel-cut-function (text &optional push)
+                  (with-temp-buffer
+                    (insert text)
+                    (call-process-region (point-min) (point-max) "xsel" nil 0 nil "--clipboard" "--input")))
+                (defun xsel-paste-function()
+
+                  (let ((xsel-output (shell-command-to-string "xsel --clipboard --output")))
+                    (unless (string= (car kill-ring) xsel-output)
+                      xsel-output )))
+                (setq interprogram-cut-function 'xsel-cut-function)
+                (setq interprogram-paste-function 'xsel-paste-function)
+#+end_src
+
+** Delet Key
+#+begin_src emacs-lisp
+(global-set-key [(control ?h)] 'delete-backward-char)
+(keyboard-translate ?\C-h ?\C-?)
+
 
 #+end_src
