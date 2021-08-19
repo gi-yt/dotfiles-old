@@ -8,18 +8,13 @@
 - [[#config-reload][Config Reload]]
 - [[#open-config][Open Config]]
 - [[#daemon-improvements][Daemon improvements]]
-- [[#epa][EPA]]
 - [[#goto-addr][GOTO-ADDR]]
 - [[#alert][Alert]]
-- [[#highlight-indent][Highlight Indent]]
-- [[#aggressive-indent][Aggressive-indent]]
-- [[#smart-parenthesis][Smart Parenthesis]]
 - [[#expand-region][Expand Region]]
 - [[#org][ORG]]
   - [[#additions][Additions]]
   - [[#ui][UI]]
 - [[#which-key][Which Key]]
-- [[#rainbow-parens][Rainbow Parens]]
 - [[#modeline][Modeline]]
 - [[#theme][Theme]]
 - [[#magit][Magit]]
@@ -40,14 +35,10 @@
 - [[#0x0st][0x0.st]]
 - [[#discover-a-modes-keybindings][Discover a mode's keybindings]]
 - [[#dired][Dired]]
-- [[#kde-connect][KDE Connect]]
-- [[#gif][GIF]]
 - [[#telega][Telega]]
 - [[#org-toc][ORG TOC]]
-- [[#matrix][Matrix]]
 - [[#chrome-on-emacs][Chrome on emacs]]
 - [[#better-binds-thanks-ergoemacs][Better Binds (Thanks Ergoemacs)]]
-- [[#org-krita][Org Krita]]
 
 * Remove Junk Buffers
 These buffers are nothing but an annoyance
@@ -126,15 +117,6 @@ These buffers are nothing but an annoyance
       (message "Loading in regular Emacs!"))
     (setq doom-modeline-icon t)
   #+end_src
-* EPA
-  I like gpg
-  #+begin_src emacs-lisp
-  ;; Always replace encrypted text with plain text version
-  (setq epa-replace-original-text t)
-  ;; Let Emacs query the passphrase through the minibuffer
-  (setq epg-pinentry-mode 'loopback)
-  #+end_src
-
 * GOTO-ADDR
 Very useful
   #+begin_src emacs-lisp
@@ -152,129 +134,6 @@ Very useful
   :config
   ;; send alerts by default to D-Bus
   (setq alert-default-style 'libnotify))
-  #+end_src
-
-* Highlight Indent
-Very useful for python
-It shows the indentation with | symbol like in PyCharm
-#+begin_src emacs-lisp
-;; highlight indentations in python
-(use-package highlight-indent-guides
-  :hook ((python-mode sass-mode yaml-mode nim-mode) . highlight-indent-guides-mode)
-  :config
-  ;; Don't highlight first level (that would be a line at column 1)
-  (defun my-highlighter (level responsive display)
-    (if (> 1 level) ; replace `1' with the number of guides you want to hide
-        nil
-      (highlight-indent-guides--highlighter-default level responsive display)))
-
-  (setq highlight-indent-guides-highlighter-function 'my-highlighter)
-  (setq highlight-indent-guides-method 'character)
-  (setq highlight-indent-guides-character ?\|)
-  (setq highlight-indent-guides-auto-odd-face-perc 15)
-  (setq highlight-indent-guides-auto-even-face-perc 15)
-  (setq highlight-indent-guides-auto-character-face-perc 20)
-
-  (highlight-indent-guides-auto-set-faces))
-  #+end_src
-
-* Aggressive-indent
-It auto-indents everything
-I love indentation
-  #+begin_src emacs-lisp
-(use-package aggressive-indent
-  :hook ((emacs-lisp-mode lisp-mode hy-mode clojure-mode css js-mode) . aggressive-indent-mode)
-  :config
-  ;; Normally this functions from `indent.el' always displays an
-  ;; annoying "reporter" message that it's indenting the current region.
-  ;; This patch disables that message
-  (defun indent-region-line-by-line (start end)
-    (save-excursion
-      (setq end (copy-marker end))
-      (goto-char start)
-      (while (< (point) end)
-        (or (and (bolp) (eolp))
-            (indent-according-to-mode))
-        (forward-line 1))
-      (move-marker end nil))))
-
-  #+end_src
-
-* Smart Parenthesis
-
-smartparens smartly adds parens.
-Used to use electric-pairs but it was bad especially with ' in elisp
-
-#+begin_src emacs-lisp
-(use-package smartparens
-  :defer 1
-  :hook ((
-          emacs-lisp-mode lisp-mode lisp-data-mode clojure-mode cider-repl-mode hy-mode
-          prolog-mode go-mode cc-mode python-mode
-          typescript-mode json-mode javascript-mode java-mode
-          ) . smartparens-strict-mode)
-  ;; :hook (prog-mode . smartparens-strict-mode)
-  :bind (:map smartparens-mode-map
-         ;; This is the paredit mode map minus a few key bindings
-         ;; that I use in other modes (e.g. M-?)
-         ("C-M-f" . sp-forward-sexp) ;; navigation
-         ("C-M-b" . sp-backward-sexp)
-         ("C-M-u" . sp-backward-up-sexp)
-         ("C-M-d" . sp-down-sexp)
-         ("C-M-p" . sp-backward-down-sexp)
-         ("C-M-n" . sp-up-sexp)
-         ("C-w" . whole-line-or-region-sp-kill-region)
-         ("M-s" . sp-splice-sexp) ;; depth-changing commands
-         ("M-r" . sp-splice-sexp-killing-around)
-         ("M-(" . sp-wrap-round)
-         ("C-)" . sp-forward-slurp-sexp) ;; barf/slurp
-         ("C-<right>" . sp-forward-slurp-sexp)
-         ("C-}" . sp-forward-barf-sexp)
-         ("C-<left>" . sp-forward-barf-sexp)
-         ("C-(" . sp-backward-slurp-sexp)
-         ("C-M-<left>" . sp-backward-slurp-sexp)
-         ("C-{" . sp-backward-barf-sexp)
-         ("C-M-<right>" . sp-backward-barf-sexp)
-         ("M-S" . sp-split-sexp) ;; misc
-         ("M-j" . sp-join-sexp))
-  :config
-  (require 'smartparens-config)
-  (setq sp-base-key-bindings 'paredit)
-  (setq sp-autoskip-closing-pair 'always)
-  ;; Always highlight matching parens
-  (show-smartparens-global-mode +1)
-  (setq blink-matching-paren nil)  ;; Don't blink matching parens
-  (defun whole-line-or-region-sp-kill-region (prefix)
-    "Call `sp-kill-region' on region or PREFIX whole lines."
-    (interactive "*p")
-    (whole-line-or-region-wrap-beg-end 'sp-kill-region prefix))
-  ;; Create keybindings to wrap symbol/region in pairs
-  (defun prelude-wrap-with (s)
-    "Create a wrapper function for smartparens using S."
-    `(lambda (&optional arg)
-       (interactive "P")
-       (sp-wrap-with-pair ,s)))
-  (define-key prog-mode-map (kbd "M-(") (prelude-wrap-with "("))
-  (define-key prog-mode-map (kbd "M-[") (prelude-wrap-with "["))
-  (define-key prog-mode-map (kbd "M-{") (prelude-wrap-with "{"))
-  (define-key prog-mode-map (kbd "M-\"") (prelude-wrap-with "\""))
-  (define-key prog-mode-map (kbd "M-'") (prelude-wrap-with "'"))
-  (define-key prog-mode-map (kbd "M-`") (prelude-wrap-with "`"))
-  ;; smart curly braces
-  (sp-pair "{" nil :post-handlers
-           '(((lambda (&rest _ignored)
-                (crux-smart-open-line-above)) "RET")))
-  (sp-pair "[" nil :post-handlers
-           '(((lambda (&rest _ignored)
-                (crux-smart-open-line-above)) "RET")))
-  (sp-pair "(" nil :post-handlers
-           '(((lambda (&rest _ignored)
-                (crux-smart-open-line-above)) "RET")))
-  ;; Don't include semicolon ; when slurping
-  (add-to-list 'sp-sexp-suffix '(java-mode regexp ""))
-  ;; use smartparens-mode everywhere
-  (smartparens-global-mode))
-
   #+end_src
 
 * Expand Region
@@ -345,14 +204,6 @@ Key previews
 
   #+end_src
 
-* Rainbow Parens
-Rainbow parentheiss
-  #+begin_src emacs-lisp
-(use-package rainbow-delimiters
-:straight t
-  :hook (prog-mode . rainbow-delimiters-mode))
-  #+end_src
-
 * Modeline
 I can't switch from doom-modeline
   #+begin_src emacs-lisp
@@ -396,8 +247,10 @@ After using magit for a while, I can't use git cli for anythin other than adding
 * Goggles
 Animations for killing, pasting etc. etc.
 #+begin_src emacs-lisp
-  (use-package goggles)
-  (goggles-mode)
+  (use-package goggles
+  :config
+  (setq-default goggles-pulse t)
+  (goggles-mode))
   #+end_src
 
 * Use local Emacs Instance as $EDITOR
@@ -484,23 +337,24 @@ Note taking
 * Blog
 Publish to my blog
   #+begin_src emacs-lisp
-(setq org-capture-templates
-        '(("p" "Post" plain
-                (file create-blog-post)
-                (file "~/website/org-templates/post.orgcaptmpl"))))
-    (defun create-blog-post ()
-      "Create an org file in ~/source/myblog/posts."
-      (interactive)
-      (let ((name (read-string "Filename: ")))
-        (expand-file-name (format "%s.org" name) "~/website/posts")))
-    (defun blog-publish ()
-      (interactive)
-      (cd "~/website")
-      (async-shell-command "make publish && git add -A && git commit -a -m New && git push"))
-    (defun blog-post ()
-      (interactive)
-      "Capture a TODO item"
-      (org-capture nil "p"))
+    (setq org-capture-templates
+            '(("p" "Post" plain
+                    (file create-blog-post)
+                    (file "~/website/org-templates/post.orgcaptmpl"))))
+        (defun create-blog-post ()
+          "Create an org file in ~/source/myblog/posts."
+          (interactive)
+          (let ((name (read-string "Filename: ")))
+            (expand-file-name (format "%s.org" name) "~/website/posts")))
+        (defun blog-publish ()
+          (interactive)
+          (cd "~/website")
+          (async-shell-command "make publish")
+          (magit-status))
+        (defun blog-post ()
+          (interactive)
+          "Capture a TODO item"
+          (org-capture nil "p"))
 
 
 
@@ -560,12 +414,6 @@ My keybings list
 (global-unset-key (kbd "C-z"))
 (general-define-key
  :prefix "C-z"
- "bb" 'ibuffer
- "bk" 'kill-current-buffer
- "bn" 'next-buffer
- "bp" 'previous-buffer
- "bB" 'ibuffer-list-buffers
- "bK" 'kill-buffer
  "eb" 'eval-buffer
  "ed" 'eval-defun
  "ee" 'eval-expression
@@ -586,18 +434,6 @@ My keybings list
  "ss" 'sh-scratch
  "ds" 'sudo-edit
  "dd" 'counsel-find-file
- "gf" 'epa-encrypt-file
- "gr" 'epa-encrypt-region
- "gme" 'epa-mail-encrypt
- "gmd" 'epa-mail-decrypt
- "gms" 'epa-mail-sign
- "gmv" 'epa-mail-verify
- "gki" 'epa-import-keys
- "gkd" 'epa-delete-keys
- "gkl" 'epa-list-keys
- "rt" 'newsticker-treeview
- "rs" 'newsticker-start
- "ra" 'newsticker-add-url
  "."     '(find-file :which-key "Find file")
  "d r"   '(counsel-recentf :which-key "Recent files")
  "d s"   '(save-buffer :which-key "Save file")
@@ -682,21 +518,6 @@ Display and insert emojis in emacs
      (setq wdired-use-interactive-rename nil)
    #+end_src
 
-* KDE Connect
-#+begin_src emacs-lisp
-(use-package kdeconnect
-  :defer t)
-#+end_src
-
-* GIF
-#+begin_src emacs-lisp
-    (use-package gif-screencast :defer t :config
-  (with-eval-after-load 'gif-screencast
-    (define-key gif-screencast-mode-map (kbd "<f8>") 'gif-screencast-toggle-pause)
-    (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
-(global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop))
-#+end_src
-
 * Telega
 #+begin_src emacs-lisp
   (use-package telega :defer t)
@@ -707,20 +528,6 @@ Display and insert emojis in emacs
   (use-package toc-org
 :hook (org-mode . toc-org-mode)
     )
-#+end_src
-
-* Matrix
-#+begin_src emacs-lisp
-    ;; Install `plz' HTTP library (not on MELPA yet).
-    (use-package plz
-      :straight '(plz :host github :repo "alphapapa/plz.el")
-      :defer t)
-
-    ;; Install Ement.
-    (use-package ement
-      :straight '(ement :host github :repo "alphapapa/ement.el")
-      :defer t)
-
 #+end_src
 
 * Chrome on emacs
@@ -747,15 +554,15 @@ Display and insert emojis in emacs
 * Better Binds (Thanks Ergoemacs)
 #+begin_src emacs-lisp
     ;; make cursor movement keys under right hand's home-row.
-    (global-set-key (kbd "M-i") 'previous-line)
-    (global-set-key (kbd "M-j") 'backward-char)
-    (global-set-key (kbd "M-k") 'next-line)
-    (global-set-key (kbd "M-l") 'forward-char)
+    (global-set-key (kbd "C-i ") 'previous-line)
+    (global-set-key (kbd "C-j") 'backward-char)
+    (global-set-key (kbd "C-k") 'next-line)
+    (global-set-key (kbd "C-l") 'forward-char)
 
     (global-set-key (kbd "M-u") 'backward-word)
     (global-set-key (kbd "M-o") 'forward-word)
 
-    (global-set-key (kbd "M-SPC") 'set-mark-command)
+
 
     (defun xah-cut-line-or-region ()
     "Cut current line, or text selection.
@@ -807,12 +614,4 @@ Display and insert emojis in emacs
               (end-of-line)
               (forward-char)))))))
 
-#+end_src
-
-* Org Krita
-#+begin_src emacs-lisp
-(use-package org-krita
-  :straight (:host github
-           :repo "lepisma/org-krita"
-           :files ("resources" "resources" "*.el" "*.el")))
 #+end_src

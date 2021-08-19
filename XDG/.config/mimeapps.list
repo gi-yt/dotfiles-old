@@ -1,7 +1,0 @@
-[Added Associations]
-application/rss+xml=emacs.desktop;vim.desktop;
-x-scheme-handler/tg=userapp-Telegram Desktop-AI4Q60.desktop;
-
-[Default Applications]
-x-scheme-handler/tg=userapp-Telegram Desktop-AI4Q60.desktop
-x-scheme-handler/org-protocol=org-protocol.desktop

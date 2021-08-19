@@ -48,120 +48,11 @@
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
 
-;; Always replace encrypted text with plain text version
-(setq epa-replace-original-text t)
-;; Let Emacs query the passphrase through the minibuffer
-(setq epg-pinentry-mode 'loopback)
-
 (use-package goto-addr :straight t
   :hook ((org-mode compilation-mode prog-mode eshell-mode shell-mode) . goto-address-mode)
   :bind (:map goto-address-highlight-keymap
 	 ("<RET>" . goto-address-at-point)
 	 ("M-<RET>" . newline)))
-
-;; highlight indentations in python
-(use-package highlight-indent-guides
-  :hook ((python-mode sass-mode yaml-mode nim-mode) . highlight-indent-guides-mode)
-  :config
-  ;; Don't highlight first level (that would be a line at column 1)
-  (defun my-highlighter (level responsive display)
-    (if (> 1 level) ; replace `1' with the number of guides you want to hide
-        nil
-      (highlight-indent-guides--highlighter-default level responsive display)))
-
-  (setq highlight-indent-guides-highlighter-function 'my-highlighter)
-  (setq highlight-indent-guides-method 'character)
-  (setq highlight-indent-guides-character ?\|)
-  (setq highlight-indent-guides-auto-odd-face-perc 15)
-  (setq highlight-indent-guides-auto-even-face-perc 15)
-  (setq highlight-indent-guides-auto-character-face-perc 20)
-
-  (highlight-indent-guides-auto-set-faces))
-
-(use-package aggressive-indent
-  :hook ((emacs-lisp-mode lisp-mode hy-mode clojure-mode css js-mode) . aggressive-indent-mode)
-  :config
-  ;; Normally this functions from `indent.el' always displays an
-  ;; annoying "reporter" message that it's indenting the current region.
-  ;; This patch disables that message
-  (defun indent-region-line-by-line (start end)
-    (save-excursion
-      (setq end (copy-marker end))
-      (goto-char start)
-      (while (< (point) end)
-        (or (and (bolp) (eolp))
-            (indent-according-to-mode))
-        (forward-line 1))
-      (move-marker end nil))))
-
-(use-package smartparens
-  :defer 1
-  :hook ((
-          emacs-lisp-mode lisp-mode lisp-data-mode clojure-mode cider-repl-mode hy-mode
-          prolog-mode go-mode cc-mode python-mode
-          typescript-mode json-mode javascript-mode java-mode
-          ) . smartparens-strict-mode)
-  ;; :hook (prog-mode . smartparens-strict-mode)
-  :bind (:map smartparens-mode-map
-         ;; This is the paredit mode map minus a few key bindings
-         ;; that I use in other modes (e.g. M-?)
-         ("C-M-f" . sp-forward-sexp) ;; navigation
-         ("C-M-b" . sp-backward-sexp)
-         ("C-M-u" . sp-backward-up-sexp)
-         ("C-M-d" . sp-down-sexp)
-         ("C-M-p" . sp-backward-down-sexp)
-         ("C-M-n" . sp-up-sexp)
-         ("C-w" . whole-line-or-region-sp-kill-region)
-         ("M-s" . sp-splice-sexp) ;; depth-changing commands
-         ("M-r" . sp-splice-sexp-killing-around)
-         ("M-(" . sp-wrap-round)
-         ("C-)" . sp-forward-slurp-sexp) ;; barf/slurp
-         ("C-<right>" . sp-forward-slurp-sexp)
-         ("C-}" . sp-forward-barf-sexp)
-         ("C-<left>" . sp-forward-barf-sexp)
-         ("C-(" . sp-backward-slurp-sexp)
-         ("C-M-<left>" . sp-backward-slurp-sexp)
-         ("C-{" . sp-backward-barf-sexp)
-         ("C-M-<right>" . sp-backward-barf-sexp)
-         ("M-S" . sp-split-sexp) ;; misc
-         ("M-j" . sp-join-sexp))
-  :config
-  (require 'smartparens-config)
-  (setq sp-base-key-bindings 'paredit)
-  (setq sp-autoskip-closing-pair 'always)
-  ;; Always highlight matching parens
-  (show-smartparens-global-mode +1)
-  (setq blink-matching-paren nil)  ;; Don't blink matching parens
-  (defun whole-line-or-region-sp-kill-region (prefix)
-    "Call `sp-kill-region' on region or PREFIX whole lines."
-    (interactive "*p")
-    (whole-line-or-region-wrap-beg-end 'sp-kill-region prefix))
-  ;; Create keybindings to wrap symbol/region in pairs
-  (defun prelude-wrap-with (s)
-    "Create a wrapper function for smartparens using S."
-    `(lambda (&optional arg)
-       (interactive "P")
-       (sp-wrap-with-pair ,s)))
-  (define-key prog-mode-map (kbd "M-(") (prelude-wrap-with "("))
-  (define-key prog-mode-map (kbd "M-[") (prelude-wrap-with "["))
-  (define-key prog-mode-map (kbd "M-{") (prelude-wrap-with "{"))
-  (define-key prog-mode-map (kbd "M-\"") (prelude-wrap-with "\""))
-  (define-key prog-mode-map (kbd "M-'") (prelude-wrap-with "'"))
-  (define-key prog-mode-map (kbd "M-`") (prelude-wrap-with "`"))
-  ;; smart curly braces
-  (sp-pair "{" nil :post-handlers
-           '(((lambda (&rest _ignored)
-                (crux-smart-open-line-above)) "RET")))
-  (sp-pair "[" nil :post-handlers
-           '(((lambda (&rest _ignored)
-                (crux-smart-open-line-above)) "RET")))
-  (sp-pair "(" nil :post-handlers
-           '(((lambda (&rest _ignored)
-                (crux-smart-open-line-above)) "RET")))
-  ;; Don't include semicolon ; when slurping
-  (add-to-list 'sp-sexp-suffix '(java-mode regexp ""))
-  ;; use smartparens-mode everywhere
-  (smartparens-global-mode))
 
 (use-package expand-region
   :straight t
@@ -216,10 +107,6 @@
 (which-key-mode)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(use-package rainbow-delimiters
-:straight t
-  :hook (prog-mode . rainbow-delimiters-mode))
-
 (use-package all-the-icons :straight t :defer t)
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
@@ -248,8 +135,10 @@
 
 (use-package magit :straight t :defer t :commands magit-status :custom  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-(use-package goggles)
-(goggles-mode)
+(use-package goggles
+:config
+(setq-default goggles-pulse t)
+(goggles-mode))
 
 (use-package esup :defer t)
 
@@ -317,7 +206,8 @@
     (defun blog-publish ()
       (interactive)
       (cd "~/website")
-      (async-shell-command "make publish && git add -A && git commit -a -m New && git push"))
+      (async-shell-command "make publish")
+      (magit-status))
     (defun blog-post ()
       (interactive)
       "Capture a TODO item"
@@ -364,12 +254,6 @@
 (global-unset-key (kbd "C-z"))
 (general-define-key
  :prefix "C-z"
- "bb" 'ibuffer
- "bk" 'kill-current-buffer
- "bn" 'next-buffer
- "bp" 'previous-buffer
- "bB" 'ibuffer-list-buffers
- "bK" 'kill-buffer
  "eb" 'eval-buffer
  "ed" 'eval-defun
  "ee" 'eval-expression
@@ -390,18 +274,6 @@
  "ss" 'sh-scratch
  "ds" 'sudo-edit
  "dd" 'counsel-find-file
- "gf" 'epa-encrypt-file
- "gr" 'epa-encrypt-region
- "gme" 'epa-mail-encrypt
- "gmd" 'epa-mail-decrypt
- "gms" 'epa-mail-sign
- "gmv" 'epa-mail-verify
- "gki" 'epa-import-keys
- "gkd" 'epa-delete-keys
- "gkl" 'epa-list-keys
- "rt" 'newsticker-treeview
- "rs" 'newsticker-start
- "ra" 'newsticker-add-url
  "."     '(find-file :which-key "Find file")
  "d r"   '(counsel-recentf :which-key "Recent files")
  "d s"   '(save-buffer :which-key "Save file")
@@ -458,30 +330,11 @@
    (setq wdired-allow-to-redirect-links t)
    (setq wdired-use-interactive-rename nil)
 
-(use-package kdeconnect
-  :defer t)
-
-(use-package gif-screencast :defer t :config
-  (with-eval-after-load 'gif-screencast
-    (define-key gif-screencast-mode-map (kbd "<f8>") 'gif-screencast-toggle-pause)
-    (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
-(global-set-key (kbd "<f9>") 'gif-screencast-start-or-stop))
-
 (use-package telega :defer t)
 
 (use-package toc-org
 :hook (org-mode . toc-org-mode)
     )
-
-;; Install `plz' HTTP library (not on MELPA yet).
-(use-package plz
-  :straight '(plz :host github :repo "alphapapa/plz.el")
-  :defer t)
-
-;; Install Ement.
-(use-package ement
-  :straight '(ement :host github :repo "alphapapa/ement.el")
-  :defer t)
 
 (use-package edit-server
   :straight t
@@ -501,15 +354,15 @@
                   (window-system . x))))
 
 ;; make cursor movement keys under right hand's home-row.
-  (global-set-key (kbd "M-i") 'previous-line)
-  (global-set-key (kbd "M-j") 'backward-char)
-  (global-set-key (kbd "M-k") 'next-line)
-  (global-set-key (kbd "M-l") 'forward-char)
+  (global-set-key (kbd "C-i ") 'previous-line)
+  (global-set-key (kbd "C-j") 'backward-char)
+  (global-set-key (kbd "C-k") 'next-line)
+  (global-set-key (kbd "C-l") 'forward-char)
 
   (global-set-key (kbd "M-u") 'backward-word)
   (global-set-key (kbd "M-o") 'forward-word)
 
-  (global-set-key (kbd "M-SPC") 'set-mark-command)
+
 
   (defun xah-cut-line-or-region ()
   "Cut current line, or text selection.
@@ -560,11 +413,6 @@ Version 2018-09-10"
             (copy-region-as-kill (line-beginning-position) (line-end-position))
             (end-of-line)
             (forward-char)))))))
-
-(use-package org-krita
-  :straight (:host github
-           :repo "lepisma/org-krita"
-           :files ("resources" "resources" "*.el" "*.el")))
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 

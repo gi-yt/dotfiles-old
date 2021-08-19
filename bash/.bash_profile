@@ -4,7 +4,7 @@
 
 # I use vterm, but for many things alacritty is better
 export TERMINAL="alacritty"
-export BROWSER="qutebrowser"
+export BROWSER="brave-browser"
 
 # ~/ Clean-up:
 export XDG_CONFIG_HOME="$HOME/.config"
