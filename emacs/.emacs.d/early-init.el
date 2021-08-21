@@ -6,7 +6,7 @@
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
 (set-fringe-mode 10)        ; Give some breathing room
-
+(setq ring-bell-function 'ignore)
 (menu-bar-mode -1)            ; Disable the menu bar
 
 ;; Disable the visible bell

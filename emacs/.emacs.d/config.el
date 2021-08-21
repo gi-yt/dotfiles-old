@@ -94,6 +94,13 @@
 :hook (org-mode . toc-org-mode)
     )
 
+(use-package org-auto-tangle
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode))
+
+(use-package ox-twbs :defer t
+  :straight t)
+
 (use-package which-key
   :init
   (setq which-key-side-window-location 'bottom
@@ -111,33 +118,126 @@
 (which-key-mode)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(use-package all-the-icons :straight t :defer t)
-(use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
-  :custom
-  (doom-modeline-height 25)
-  (doom-modeline-bar-width 1)
-  (doom-modeline-icon t)
-  (doom-modeline-major-mode-icon t)
-  (doom-modeline-major-mode-color-icon t)
-  (doom-modeline-buffer-file-name-style 'truncate-upto-project)
-  (doom-modeline-buffer-state-icon t)
-  (doom-modeline-buffer-modification-icon t)
-  (doom-modeline-minor-modes nil)
-  (doom-modeline-enable-word-count nil)
-  (doom-modeline-buffer-encoding t)
-  (doom-modeline-indent-info nil)
-  (doom-modeline-checker-simple-format t)
-  (doom-modeline-vcs-max-length 12)
-  (doom-modeline-env-version t)
-  (doom-modeline-irc-stylize 'identity)
-  (doom-modeline-github-timer nil)
-  (doom-modeline-gnus-timer nil))
+;; (use-package spaceline
+;;   :ensure t
+;;   :config
+;;   (require 'spaceline-config)
+;;     (setq spaceline-buffer-encoding-abbrev-p nil)
+;;     (setq spaceline-line-column-p nil)
+;;     (setq spaceline-line-p nil)
+;;     (setq powerline-default-separator (quote arrow))
+;;     (spaceline-spacemacs-theme))
+;; (use-package telephone-line
+;;   :after winum
+;;   :custom
+;;   (telephone-line-primary-left-separator 'telephone-line-cubed-left)
+;;   (telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left)
+;;   (telephone-line-primary-right-separator 'telephone-line-cubed-right)
+;;   (telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right)
+;;   (telephone-line-height 24)
+;;   (telephone-line-evil-use-short-tag t)
+;;   :config
+;;   (telephone-line-defsegment telephone-line-pdf-segment ()
+;; 			     (if (eq major-mode 'pdf-view-mode)
+;; 				 (propertize (pdf-view-page-number)
+;; 					     'face '(:inherit)
+;; 					     'display '(raise 0.0)
+;; 					     'mouse-face '(:box 1)
+;; 					     'local-map (make-mode-line-mouse-map
+;; 							 'mouse-1 (lambda ()
+;; 								    (interactive)
+;; 								    (pdf-view-goto-page))))))
+;;   (telephone-line-defsegment telephone-line-winum-segment ()
+;; 			     (propertize winum--mode-line-segment
+;; 					 'face '(:box (:line-width 2 :color "cyan" :style released-button))
+;; 					 'display '(raise 0.0)
+;; 					 'mouse-face '(:box 1)))
+;;   (setq telephone-line-lhs '((accent . (telephone-line-winum-segment
+;; 					telephone-line-pdf-segment
+;; 					telephone-line-vc-segment
+;; 					telephone-line-erc-modified-channels-segment
+;; 					telephone-line-process-segment))
+;; 			     (nil . (telephone-line-projectile-segment telephone-line-buffer-segment))))
+;;   (telephone-line-mode t))
+
+;; (use-package telephone-line
+;;   :after winum
+;;   :custom
+;;   (telephone-line-primary-left-separator 'telephone-line-cubed-left)
+;;   (telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left)
+;;   (telephone-line-primary-right-separator 'telephone-line-cubed-right)
+;;   (telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right)
+;;   (telephone-line-height 24)
+;;   (telephone-line-evil-use-short-tag t)
+;;   :config
+;;   (setq telephone-line-faces '((evil . telephone-line-modal-face)
+;; 			       (modal . telephone-line-modal-face)
+;; 			       (ryo . telephone-line-ryo-modal-face)
+;; 			       (accent telephone-line-accent-active . telephone-line-accent-inactive)
+;; 			       (nil mode-line . mode-line-inactive)
+;; 			       (winum . (winum-face . winum-face))))
+;;   (telephone-line-defsegment telephone-line-org-clock-segment ()
+;;     (when (telephone-line-selected-window-active)
+;;       (if (and (functionp 'org-clocking-p) (org-clocking-p))
+;; 	  (org-clock-get-clock-string))))
+;;   (telephone-line-defsegment telephone-line-pdf-segment ()
+;;     (when (eq major-mode 'pdf-view-mode)
+;;       (propertize (pdf-view-page-number)
+;; 		  'face '(:inherit)
+;; 		  'display '(raise 0.0)
+;; 		  'mouse-face '(:box 1))))
+;;   (telephone-line-defsegment telephone-line-winum-segment ()
+;;     (propertize (eval (cadr winum--mode-line-segment))
+;; 		'face '(:box (:line-width 2 :color "cyan" :style released-button))
+;; 		'display '(raise 0.0)
+;; 		'mouse-face '(:box 1)))
+;;   (telephone-line-defsegment telephone-line-battery-segment ()
+;;     (when (telephone-line-selected-window-active)
+;;       (propertize battery-mode-line-string
+;; 		  'mouse-face '(:box 1))))
+
+;;   (setq telephone-line-lhs '((winum . (telephone-line-winum-segment))
+;; 			     (accent . (telephone-line-pdf-segment
+;; 					telephone-line-vc-segment
+;; 					telephone-line-erc-modified-channels-segment
+;; 					telephone-line-process-segment))
+;; 			     (nil . (telephone-line-projectile-segment
+;; 				     telephone-line-buffer-segment
+;; 				     telephone-line-org-clock-segment
+;; 				     ))))
+;;   (setq telephone-line-center-rhs '((evil . (telephone-line-battery-segment))))
+;;   (setq telephone-line-rhs '((nil . (telephone-line-flycheck-segment
+;; 				     ))
+;; 			     (accent . (telephone-line-major-mode-segment))
+;; 			     (evil . (telephone-line-airline-position-segment))))
+;;   (telephone-line-mode t))
+
+(use-package moody
+  :unless noninteractive
+  :defer 1
+  ;;:init
+  ;;(set-background-color "black")
+  ;;(set-foreground-color "white")
+  ;; If you use the default Emacs black theme (no external theme loaded) you have to specify
+  ;; a different color for mode-line-buffer-id or it will be the same as the background
+  ;;(set-face-attribute 'mode-line-buffer-id nil :foreground "light sky blue" :weight 'bold)
+  ;;(let ((line (face-attribute 'mode-line :underline)))
+  ;;  (set-face-attribute 'mode-line nil :overline line)
+  ;;  (set-face-attribute 'mode-line-inactive nil :overline line)
+  ;;  (set-face-attribute 'mode-line-inactive nil :underline line)
+  ;;  (set-face-attribute 'mode-line nil :box nil)
+  ;;  (set-face-attribute 'mode-line-inactive nil :box nil))
+  :config
+  (setq x-underline-at-descent-line t)
+  (setq moody-mode-line-height 20)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 
 ;; (use-package doom-themes :straight t :init (load-theme 'doom-dracula))
 
 (if (display-graphic-p)
-    (use-package atom-one-dark-theme :straight t :init (load-theme 'atom-one-dark))
+    ;;(use-package atom-one-dark-theme :straight t :init (load-theme 'atom-one-dark))
+    (use-package zerodark-theme :straight t :init (load-theme 'zerodark))
   (load-theme 'tsdh-dark))
 
 (use-package magit :straight t :defer t :commands magit-status :custom  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
@@ -302,10 +402,6 @@
 
 (global-undo-fu-session-mode)
 
-(use-package evil-nerd-commenter
-  :straight t
-  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
-
 (use-package super-save
 :straight t
   :diminish super-save-mode
@@ -339,71 +435,6 @@
 
 (use-package telega :defer t)
 
-(use-package org-auto-tangle
-  :defer t
-  :hook (org-mode . org-auto-tangle-mode))
-
-;; make cursor movement keys under right hand's home-row.
-  (global-set-key (kbd "C-i ") 'previous-line)
-  (global-set-key (kbd "C-j") 'backward-char)
-  (global-set-key (kbd "C-k") 'next-line)
-  (global-set-key (kbd "C-l") 'forward-char)
-
-  (global-set-key (kbd "M-u") 'backward-word)
-  (global-set-key (kbd "M-o") 'forward-word)
-
-
-
-  (defun xah-cut-line-or-region ()
-  "Cut current line, or text selection.
-When `universal-argument' is called first, cut whole buffer (respects `narrow-to-region').
-
-URL `http://ergoemacs.org/emacs/emacs_copy_cut_current_line.html'
-Version 2015-06-10"
-  (interactive)
-  (if current-prefix-arg
-      (progn ; not using kill-region because we don't want to include previous kill
-        (kill-new (buffer-string))
-        (delete-region (point-min) (point-max)))
-    (progn (if (use-region-p)
-               (kill-region (region-beginning) (region-end) t)
-             (kill-region (line-beginning-position) (line-beginning-position 2))))))
-(defun xah-copy-line-or-region ()
-  "Copy current line, or text selection.
-When called repeatedly, append copy subsequent lines.
-When `universal-argument' is called first, copy whole buffer (respects `narrow-to-region').
-
-URL `http://ergoemacs.org/emacs/emacs_copy_cut_current_line.html'
-Version 2018-09-10"
-  (interactive)
-  (if current-prefix-arg
-      (progn
-        (copy-region-as-kill (point-min) (point-max)))
-    (if (use-region-p)
-        (progn
-          (copy-region-as-kill (region-beginning) (region-end)))
-      (if (eq last-command this-command)
-          (if (eobp)
-              (progn )
-            (progn
-              (kill-append "\n" nil)
-              (kill-append
-               (buffer-substring-no-properties (line-beginning-position) (line-end-position))
-               nil)
-              (progn
-                (end-of-line)
-                (forward-char))))
-        (if (eobp)
-            (if (eq (char-before) 10 )
-                (progn )
-              (progn
-                (copy-region-as-kill (line-beginning-position) (line-end-position))
-                (end-of-line)))
-          (progn
-            (copy-region-as-kill (line-beginning-position) (line-end-position))
-            (end-of-line)
-            (forward-char)))))))
-
 (setq x-select-enable-clipboard t)
 (defun xsel-cut-function (text &optional push)
   (with-temp-buffer
@@ -417,8 +448,57 @@ Version 2018-09-10"
 (setq interprogram-cut-function 'xsel-cut-function)
 (setq interprogram-paste-function 'xsel-paste-function)
 
-(global-set-key [(control ?h)] 'delete-backward-char)
-(keyboard-translate ?\C-h ?\C-?)
+(use-package mark-multiple
+  :straight t
+:defer t
+  :bind ("C-c q" . 'mark-next-like-this))
+
+(defun daedreth/kill-inner-word ()
+  "Kills the entire word your cursor is in. Equivalent to 'ciw' in vim."
+  (interactive)
+  (forward-char 1)
+  (backward-word)
+  (kill-word 1))
+(global-set-key (kbd "C-c w k") 'daedreth/kill-inner-word)
+
+(defun daedreth/copy-whole-word ()
+  (interactive)
+  (save-excursion
+    (forward-char 1)
+    (backward-word)
+    (kill-word 1)
+    (yank)))
+(global-set-key (kbd "C-c w c") 'daedreth/copy-whole-word)
+
+(defun daedreth/copy-whole-line ()
+  "Copies a line without regard for cursor position."
+  (interactive)
+  (save-excursion
+    (kill-new
+     (buffer-substring
+      (point-at-bol)
+      (point-at-eol)))))
+(global-set-key (kbd "C-c l c") 'daedreth/copy-whole-line)
+
+(global-set-key (kbd "C-c l k") 'kill-whole-line)
+
+(use-package diminish
+  :ensure t
+  :init
+  (diminish 'which-key-mode)
+  (diminish 'linum-relative-mode)
+  (diminish 'hungry-delete-mode)
+  (diminish 'visual-line-mode)
+  (diminish 'subword-mode)
+  (diminish 'beacon-mode)
+  (diminish 'irony-mode)
+  (diminish 'page-break-lines-mode)
+  (diminish 'auto-revert-mode)
+  (diminish 'rainbow-delimiters-mode)
+  (diminish 'rainbow-mode)
+  (diminish 'yas-minor-mode)
+  (diminish 'flycheck-mode)
+  (diminish 'helm-mode))
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 

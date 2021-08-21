@@ -178,6 +178,17 @@
 :straight t
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(use-package evil-nerd-commenter
+  :straight t
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+
+(use-package rainbow-mode
+:defer t
+:straight t
+
+  :init
+    (add-hook 'prog-mode-hook 'rainbow-mode))
+
 (use-package company
               :straight t
         :after (lsp-mode)

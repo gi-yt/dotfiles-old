@@ -18,6 +18,8 @@
 - [[#aggressive-indent][Aggressive-indent]]
 - [[#smart-parenthesis][Smart Parenthesis]]
 - [[#rainbow-parens][Rainbow Parens]]
+- [[#nerd-commenter][Nerd Commenter]]
+- [[#colour-picker][Colour Picker]]
 
 * Haskell
   #+begin_src emacs-lisp
@@ -285,3 +287,20 @@ Rainbow parentheiss
 :straight t
   :hook (prog-mode . rainbow-delimiters-mode))
   #+end_src
+* Nerd Commenter
+comment and unhcomment with ease
+  #+begin_src emacs-lisp
+(use-package evil-nerd-commenter
+  :straight t
+  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+  #+end_src
+
+* Colour Picker
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+  :defer t
+  :straight t
+
+    :init
+      (add-hook 'prog-mode-hook 'rainbow-mode))
+#+end_src
