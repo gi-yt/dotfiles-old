@@ -3,13 +3,10 @@
 #+auto_tangle: t
 #+PROPERTY: header-args :tangle yes
 * TOC                                                                   :TOC:
-- [[#remove-junk-buffers][Remove Junk Buffers]]
 - [[#ivy][IVY]]
 - [[#config-reload][Config Reload]]
 - [[#open-config][Open Config]]
-- [[#daemon-improvements][Daemon improvements]]
 - [[#goto-addr][GOTO-ADDR]]
-- [[#alert][Alert]]
 - [[#expand-region][Expand Region]]
 - [[#org][ORG]]
   - [[#additions][Additions]]
@@ -22,13 +19,13 @@
 - [[#theme][Theme]]
 - [[#magit][Magit]]
 - [[#goggles][Goggles]]
+- [[#vterm][Vterm]]
 - [[#use-local-emacs-instance-as-editor][Use local Emacs Instance as $EDITOR]]
 - [[#esup][ESUP]]
 - [[#scratch][Scratch]]
 - [[#hungry-delete][Hungry Delete]]
 - [[#org-roam][ORG Roam]]
 - [[#blog][Blog]]
-- [[#vterm][Vterm]]
 - [[#newline][Newline]]
 - [[#general][General]]
 - [[#undo-fu][Undo FU]]
@@ -47,14 +44,6 @@
 - [[#kill-line][Kill Line]]
 - [[#diminish][Diminish]]
 
-* Remove Junk Buffers
-These buffers are nothing but an annoyance
-  #+begin_src emacs-lisp
-      (defun remove-scratch-buffer ()
-      (if (get-buffer "*straight-process*")
-          (kill-buffer "*straight-process*")))
-    (add-hook 'after-change-major-mode-hook 'remove-scratch-buffer)
-#+end_src
 * IVY
   I tried helm but the UI was not my taste
   I just got used to ivy
@@ -117,13 +106,6 @@ These buffers are nothing but an annoyance
 
   #+end_src
 
-* Daemon improvements
-  #+begin_src elisp
-    (if (daemonp)
-        (message "Loading in the daemon!")
-      (message "Loading in regular Emacs!"))
-    (setq doom-modeline-icon t)
-  #+end_src
 * GOTO-ADDR
 Very useful
   #+begin_src emacs-lisp
@@ -132,15 +114,6 @@ Very useful
       :bind (:map goto-address-highlight-keymap
 	     ("<RET>" . goto-address-at-point)
 	     ("M-<RET>" . newline)))
-  #+end_src
-
-* Alert
-  Get libnotify notifications from emacs
-  #+begin_src elisp
-(use-package alert :defer t
-  :config
-  ;; send alerts by default to D-Bus
-  (setq alert-default-style 'libnotify))
   #+end_src
 
 * Expand Region
@@ -190,18 +163,21 @@ Very useful for selecting text
    #+end_src
 
 ** ORG TOC
+This will auto generate TOC and will update TOC on save.
 #+begin_src emacs-lisp
   (use-package toc-org :defer t
 :hook (org-mode . toc-org-mode)
     )
 #+end_src
 ** ORG Auto-Tangle
+It will auto tangle on save if #+autotangle is true in the file
 #+begin_src emacs-lisp
 (use-package org-auto-tangle
   :defer t
   :hook (org-mode . org-auto-tangle-mode))
 #+end_src
 ** Org Bootstrap HTML
+Export to twitter bootstrap
 #+begin_src emacs-lisp
 (use-package ox-twbs :defer t
   :straight t)
@@ -374,14 +350,27 @@ Animations for killing, pasting etc. etc.
   (goggles-mode))
   #+end_src
 
+* Vterm
+My terminal of choice
+  #+begin_src emacs-lisp
+    (use-package vterm :straight t :defer t)
+      (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
+                          ("find-file" find-file)
+                          ("message" message)
+                          ("vterm-clear-scrollback" vterm-clear-scrollback)))
+;; (setq  vterm-always-compile-module nil)
+(use-package multi-vterm :straight t :defer t
+    :bind ("s-<return>" . multi-vterm))
+#+end_src
+
 * Use local Emacs Instance as $EDITOR
 the $EDITOR Var will be set such that it will open in the same instance of emacs
 #+begin_src emacs-lisp
-  (use-package with-editor
-  ;; Use local Emacs instance as $EDITOR (e.g. in `git commit' or `crontab -e')
-  :hook ((shell-mode eshell-mode term-exec vterm-mode) . with-editor-export-editor)
+  (use-package with-editor :defer t)
 
-  #+end_src)
+(add-hook 'vterm-exec-hook  'with-editor-export-editor)
+
+  #+end_src
 
 * ESUP
 Startup profiler. Very useful to check which packages are slowing my startup
@@ -480,19 +469,6 @@ Publish to my blog
 
 
   #+end_src
-
-* Vterm
-My terminal of choice
-  #+begin_src emacs-lisp
-    (use-package vterm :straight t :defer t)
-      (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
-                          ("find-file" find-file)
-                          ("message" message)
-                          ("vterm-clear-scrollback" vterm-clear-scrollback)))
-;; (setq  vterm-always-compile-module nil)
-(use-package multi-vterm :straight t :defer t
-    :bind ("s-<return>" . multi-vterm))
-#+end_src
 
 * Newline
 As an ex-evil user this is very useful
@@ -720,5 +696,5 @@ Display and insert emojis in emacs
   (diminish 'rainbow-mode)
   (diminish 'yas-minor-mode)
   (diminish 'flycheck-mode)
-  (diminish 'helm-mode))
+  (diminish 'ivy-mode))
 #+end_src

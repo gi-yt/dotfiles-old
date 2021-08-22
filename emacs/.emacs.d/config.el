@@ -1,8 +1,3 @@
-(defun remove-scratch-buffer ()
-  (if (get-buffer "*straight-process*")
-      (kill-buffer "*straight-process*")))
-(add-hook 'after-change-major-mode-hook 'remove-scratch-buffer)
-
 (use-package ivy
   :straight t
   :bind (("C-s" . swiper)
@@ -247,6 +242,19 @@
 (setq-default goggles-pulse t)
 (goggles-mode))
 
+(use-package vterm :straight t :defer t)
+      (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
+                          ("find-file" find-file)
+                          ("message" message)
+                          ("vterm-clear-scrollback" vterm-clear-scrollback)))
+;; (setq  vterm-always-compile-module nil)
+(use-package multi-vterm :straight t :defer t
+    :bind ("s-<return>" . multi-vterm))
+
+(use-package with-editor :defer t)
+
+(add-hook 'vterm-exec-hook  'with-editor-export-editor)
+
 (use-package esup :defer t)
 
 (defun xah-new-empty-buffer ()
@@ -319,15 +327,6 @@
       (interactive)
       "Capture a TODO item"
       (org-capture nil "p"))
-
-(use-package vterm :straight t :defer t)
-      (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
-                          ("find-file" find-file)
-                          ("message" message)
-                          ("vterm-clear-scrollback" vterm-clear-scrollback)))
-;; (setq  vterm-always-compile-module nil)
-(use-package multi-vterm :straight t :defer t
-    :bind ("s-<return>" . multi-vterm))
 
 ;; Behave like vi's o command
 (defun open-next-line (arg)
@@ -498,16 +497,6 @@
   (diminish 'rainbow-mode)
   (diminish 'yas-minor-mode)
   (diminish 'flycheck-mode)
-  (diminish 'helm-mode))
+  (diminish 'ivy-mode))
 
 (global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
-
-(if (daemonp)
-    (message "Loading in the daemon!")
-  (message "Loading in regular Emacs!"))
-(setq doom-modeline-icon t)
-
-(use-package alert :defer t
-  :config
-  ;; send alerts by default to D-Bus
-  (setq alert-default-style 'libnotify))
