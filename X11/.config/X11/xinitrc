@@ -3,9 +3,7 @@ gpg-connect-agent /bye &
 autorandr -c
 dm-setbg -i &
 ~/.bin/setkeys &
-dwmblocks &
 emacs --daemon &
 sxhkd &
-pipewire &
-pipewire-pulse &
-exec dwm
+eval "$(ssh-agent -s)"
+exec awesome
