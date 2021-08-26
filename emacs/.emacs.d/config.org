@@ -36,7 +36,6 @@
 - [[#dired][Dired]]
 - [[#telega][Telega]]
 - [[#emacs-terminal-improvements][Emacs terminal improvements]]
-  - [[#x-clipboard-in-emacs-terminal][X Clipboard in emacs terminal]]
 - [[#mark-multiple][Mark Multiple]]
 - [[#kill-word][Kill Word]]
 - [[#copy-word][Copy Word]]
@@ -613,22 +612,6 @@ Display and insert emojis in emacs
 #+end_src
 
 * Emacs terminal improvements
-** X Clipboard in emacs terminal
-#+begin_src emacs-lisp
-                (setq x-select-enable-clipboard t)
-                (defun xsel-cut-function (text &optional push)
-                  (with-temp-buffer
-                    (insert text)
-                    (call-process-region (point-min) (point-max) "xsel" nil 0 nil "--clipboard" "--input")))
-                (defun xsel-paste-function()
-
-                  (let ((xsel-output (shell-command-to-string "xsel --clipboard --output")))
-                    (unless (string= (car kill-ring) xsel-output)
-                      xsel-output )))
-                (setq interprogram-cut-function 'xsel-cut-function)
-                (setq interprogram-paste-function 'xsel-paste-function)
-#+end_src
-
 * Mark Multiple
 #+begin_src emacs-lisp
   (use-package mark-multiple
