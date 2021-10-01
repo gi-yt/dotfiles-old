@@ -2,7 +2,7 @@
 #+AUTHOR: Arya
 * Emacs
 :PROPERTIES:
-:header-args:emacs-lisp: :tangle "~/.emacs.d/tooty.el"
+:header-args:emacs-lisp: :tangle "~/.emacs.d/init.el"
 :END:
 ** Init Straight
 #+begin_src emacs-lisp
@@ -1624,7 +1624,7 @@ comment and unhcomment with ease
 
 * BashRC
 :PROPERTIES:
-:header-args:bash: :tangle "~/.bashyrc"
+:header-args:bash: :tangle "~/.bashrc"
 :END:
 ** Exports
 Just some basics
@@ -1965,7 +1965,7 @@ if [ -e /home/ak/.nix-profile/etc/profile.d/nix.sh ]; then . /home/ak/.nix-profi
 
 * GIT
 :PROPERTIES:
-:header-args:conf: :tangle "~/.gityconfig"
+:header-args:conf: :tangle "~/.gitconfig"
 :END:
 ** My email and name
 #+begin_src conf
