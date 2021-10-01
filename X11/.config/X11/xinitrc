@@ -1,9 +1,0 @@
-xrdb merge ~/.config/X11/Xresources &
-gpg-connect-agent /bye &
-autorandr -c
-dm-setbg -i &
-~/.bin/setkeys &
-emacs --daemon &
-sxhkd &
-eval "$(ssh-agent -s)"
-exec awesome
