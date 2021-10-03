@@ -7,443 +7,429 @@
 :END:
 ** Init Straight
 #+begin_src emacs-lisp
-;; configure straight.el
-(setq
- ;; avoid checking packages on startup to speed it up
- straight-check-for-modifications '(check-on-save)
- ;; put all autoloads into a single file
- straight-cache-autoloads t)
+(straight-use-package
+  '(app-launcher :type git :host github :repo "SebastienWae/app-launcher"))
+        (exwm-input-set-key (kbd "s-SPC") 'app-launcher-run-app)
 
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
+  ;; configure straight.el
+  (setq
+   ;; avoid checking packages on startup to speed it up
+   straight-check-for-modifications '(check-on-save)
+   ;; put all autoloads into a single file
+   straight-cache-autoloads t)
+
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+  (straight-use-package 'use-package)
+  (setq straight-use-package-by-default t)
 #+end_src
 ** Basic
 #+begin_src emacs-lisp
-  (setq inhibit-startup-screen t)
-  (line-number-mode t)
-  (column-number-mode t)
-  (size-indication-mode t) ; Displays the File Size in the modeline
-  (setq auto-window-vscroll nil)
-  (fset 'yes-or-no-p 'y-or-n-p)
-  (global-hl-line-mode +1)
-  (setq native-comp-async-report-warnings-errors nil)
-  (setq comp-async-report-warnings-errors nil)
-  (use-package gcmh :straight t :config (gcmh-mode 1))
+    (setq inhibit-startup-screen t)
+    (line-number-mode t)
+    (column-number-mode t)
+    (size-indication-mode t) ; Displays the File Size in the modeline
+    (setq auto-window-vscroll nil)
+    (fset 'yes-or-no-p 'y-or-n-p)
+    (global-hl-line-mode +1)
+    (setq native-comp-async-report-warnings-errors nil)
+    (setq comp-async-report-warnings-errors nil)
+    (use-package gcmh :straight t :config (gcmh-mode 1))
+    (delete-selection-mode t)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (load "~/.emacs.d/sensible-defaults.el")
+  (sensible-defaults/use-all-settings)
+  (sensible-defaults/use-all-keybindings)
+  (sensible-defaults/backup-to-temp-directory)
+  (use-package no-littering
+    :demand t
+    :config
+    ;; /etc is version controlled and I want to store mc-lists in git
+    (setq mc/list-file (no-littering-expand-etc-file-name "mc-list.el"))
+    ;; Put the auto-save files in the var directory to the other data files
+    (setq auto-save-file-name-transforms
+          `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
+
+  (use-package custom
+  :straight nil
+    :config
+    ;; We don't use custom and don't have to set custom-file even
+    ;; in the case when we "accidentally" click save in a custom buffer,
+    ;; `init.el' would get modified which gets overwrite the next time
+    ;; we run `make'.
+
+    ;; Treat all themes as safe
+    (setf custom-safe-themes t))
+  (setq user-full-name "Arya Kiran"
+        user-mail-address "aryakiran@zohomail.eu")
+  (require 'generic-x)
+  (require 'display-line-numbers)
+  (defcustom display-line-numbers-exempt-modes
+    '(vterm-mode eshell-mode shell-mode term-mode ansi-term-mode pdf-view-mode)
+    "Major modes on which to disable line numbers."
+    :group 'display-line-numbers
+    :type 'list
+    :version "green")
+  (defun display-line-numbers--turn-on ()
+    "Turn on line numbers except for certain major modes.
+        Exempt major modes are defined in `display-line-numbers-exempt-modes'."
+    (unless (or (minibufferp)
+                (member major-mode display-line-numbers-exempt-modes))
+      (display-line-numbers-mode)))
+  (global-display-line-numbers-mode)
+  (global-visual-line-mode t)
+  ;; Increase the amount of data which Emacs reads from the process
+  ;; (Useful for LSP where the LSP responses are in the 800k - 3M range)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  ;; Don't compact font caches during GC as it doesn't play too nice
+  ;; with org-superstar-mode and some of my large org files (e.g. this file).
+  ;; This might enlarge the Emacs memory footprint but I don't mind if Emacs
+  ;; uses more memory but rather prefer speed.
+  (setq inhibit-compacting-font-caches t)
+  ;; Always just use left-to-right text
+  ;; This makes Emacs a bit faster for very long lines
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (use-package saveplace :straight nil
+    :unless noninteractive
+    :config (save-place-mode))
+  (use-package savehist :straight nil
+    :unless noninteractive
+    :defer 1
+    :config
+    (setq savehist-additional-variables '(compile-command kill-ring regexp-search-ring))
+    (savehist-mode 1))
+  (global-so-long-mode)
+  (setq-default indent-tabs-mode nil)   ; don't use tabs to indent
+  (setq-default tab-width 4)            ; but maintain correct appearance
+  ;; smart tab behavior - indent or complete
+  (setq tab-always-indent 'complete)
+  ;; Newline at end of file
+  (setq require-final-newline t)
+  ;; Default to utf-8 unix encoding
+  (prefer-coding-system 'utf-8-unix)
+  ;; Delete the selection with a keypress
   (delete-selection-mode t)
-(load "~/.emacs.d/sensible-defaults.el")
-(sensible-defaults/use-all-settings)
-(sensible-defaults/use-all-keybindings)
-(sensible-defaults/backup-to-temp-directory)
-(use-package no-littering
-  :demand t
-  :config
-  ;; /etc is version controlled and I want to store mc-lists in git
-  (setq mc/list-file (no-littering-expand-etc-file-name "mc-list.el"))
-  ;; Put the auto-save files in the var directory to the other data files
-  (setq auto-save-file-name-transforms
-        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
-
-(use-package custom
-:straight nil
-  :config
-  ;; We don't use custom and don't have to set custom-file even
-  ;; in the case when we "accidentally" click save in a custom buffer,
-  ;; `init.el' would get modified which gets overwrite the next time
-  ;; we run `make'.
-
-  ;; Treat all themes as safe
-  (setf custom-safe-themes t))
-(setq user-full-name "Arya Kiran"
-      user-mail-address "aryakiran@zohomail.eu")
-(require 'generic-x)
-(require 'display-line-numbers)
-(defcustom display-line-numbers-exempt-modes
-  '(vterm-mode eshell-mode shell-mode term-mode ansi-term-mode pdf-view-mode)
-  "Major modes on which to disable line numbers."
-  :group 'display-line-numbers
-  :type 'list
-  :version "green")
-(defun display-line-numbers--turn-on ()
-  "Turn on line numbers except for certain major modes.
-      Exempt major modes are defined in `display-line-numbers-exempt-modes'."
-  (unless (or (minibufferp)
-              (member major-mode display-line-numbers-exempt-modes))
-    (display-line-numbers-mode)))
-(global-display-line-numbers-mode)
-(global-visual-line-mode t)
-;; Increase the amount of data which Emacs reads from the process
-;; (Useful for LSP where the LSP responses are in the 800k - 3M range)
-(setq read-process-output-max (* 1024 1024)) ;; 1mb
-;; Don't compact font caches during GC as it doesn't play too nice
-;; with org-superstar-mode and some of my large org files (e.g. this file).
-;; This might enlarge the Emacs memory footprint but I don't mind if Emacs
-;; uses more memory but rather prefer speed.
-(setq inhibit-compacting-font-caches t)
-;; Always just use left-to-right text
-;; This makes Emacs a bit faster for very long lines
-(setq-default bidi-paragraph-direction 'left-to-right)
-(use-package saveplace :straight nil
-  :unless noninteractive
-  :config (save-place-mode))
-(use-package savehist :straight nil
-  :unless noninteractive
-  :defer 1
-  :config
-  (setq savehist-additional-variables '(compile-command kill-ring regexp-search-ring))
-  (savehist-mode 1))
-(global-so-long-mode)
-(setq-default indent-tabs-mode nil)   ; don't use tabs to indent
-(setq-default tab-width 4)            ; but maintain correct appearance
-;; smart tab behavior - indent or complete
-(setq tab-always-indent 'complete)
-;; Newline at end of file
-(setq require-final-newline t)
-;; Default to utf-8 unix encoding
-(prefer-coding-system 'utf-8-unix)
-;; Delete the selection with a keypress
-(delete-selection-mode t)
-;; Activate character folding in searches i.e. searching for 'a' matches 'ä' as well
-(setq search-default-mode 'char-fold-to-regexp)
-;; Paste with middle mouse button doesn't move the cursor
-(setq mouse-yank-at-point t)
-;; Save whatever’s in the current (system) clipboard before
-;; replacing it with the Emacs’ text.
-(setq save-interprogram-paste-before-kill t)
-;; Accept 'UTF-8' (uppercase) as a valid encoding in the coding header
-(define-coding-system-alias 'UTF-8 'utf-8)
-;; Put authinfo.gpg first so new secrets will be stored there by default and not in plain text
-(setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
-;; Don't ask to store credentials in .authinfo.gpg
-(setq auth-source-save-behavior nil)
-;; Silence ad-handle-definition about advised functions getting redefined
-(setq ad-redefinition-action 'accept)
-;; Use 'fancy' ellipses for truncated strings
-(setq truncate-string-ellipsis  " ▾")
-;; Increase the 'Limit on number of Lisp variable bindings and unwind-protects.'
-;; mu4e seems to need more sometimes and it can be safely increased.
-(setq max-specpdl-size 8192)
-;; Increase the limit to catch infinite recursions.
-;; Large scala files need sometimes more and this value can safely be increased.
-(setq max-lisp-eval-depth 32768)
-(setq-default
- indent-tabs-mode nil                             ; Prefers spaces over tabs
- load-prefer-newer t                              ; Prefers the newest version of a file
- mark-ring-max 128                                ; Maximum length of mark ring
- read-process-output-max (* 1024 1024)            ; Increase the amount of data reads from the process
- select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
- tab-width 4                                      ; Set width for tabs
- view-read-only t)                                ; Always open read-only buffers in view-mode
-(cd "~/")                                         ; Move to the user directory
-(column-number-mode 1)                            ; Show the column number
-(global-hl-line-mode)                             ; Hightlight current line
-(set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
-(show-paren-mode 1)                               ; Show the parent
-(setq large-file-warning-threshold nil)
-(setq kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions))
+  ;; Activate character folding in searches i.e. searching for 'a' matches 'ä' as well
+  (setq search-default-mode 'char-fold-to-regexp)
+  ;; Paste with middle mouse button doesn't move the cursor
+  (setq mouse-yank-at-point t)
+  ;; Save whatever’s in the current (system) clipboard before
+  ;; replacing it with the Emacs’ text.
+  (setq save-interprogram-paste-before-kill t)
+  ;; Accept 'UTF-8' (uppercase) as a valid encoding in the coding header
+  (define-coding-system-alias 'UTF-8 'utf-8)
+  ;; Put authinfo.gpg first so new secrets will be stored there by default and not in plain text
+  (setq auth-sources '("~/.authinfo.gpg" "~/.authinfo" "~/.netrc"))
+  ;; Don't ask to store credentials in .authinfo.gpg
+  (setq auth-source-save-behavior nil)
+  ;; Silence ad-handle-definition about advised functions getting redefined
+  (setq ad-redefinition-action 'accept)
+  ;; Use 'fancy' ellipses for truncated strings
+  (setq truncate-string-ellipsis  " ▾")
+  ;; Increase the 'Limit on number of Lisp variable bindings and unwind-protects.'
+  ;; mu4e seems to need more sometimes and it can be safely increased.
+  (setq max-specpdl-size 8192)
+  ;; Increase the limit to catch infinite recursions.
+  ;; Large scala files need sometimes more and this value can safely be increased.
+  (setq max-lisp-eval-depth 32768)
+  (setq-default
+   indent-tabs-mode nil                             ; Prefers spaces over tabs
+   load-prefer-newer t                              ; Prefers the newest version of a file
+   mark-ring-max 128                                ; Maximum length of mark ring
+   read-process-output-max (* 1024 1024)            ; Increase the amount of data reads from the process
+   select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
+   tab-width 4                                      ; Set width for tabs
+   view-read-only t)                                ; Always open read-only buffers in view-mode
+  (cd "~/")                                         ; Move to the user directory
+  (column-number-mode 1)                            ; Show the column number
+  (global-hl-line-mode)                             ; Hightlight current line
+  (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
+  (show-paren-mode 1)                               ; Show the parent
+  (setq large-file-warning-threshold nil)
+  (setq kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions))
 #+end_src
 ** EWM
+#+RESULTS:
+: hello
+
 #+begin_src emacs-lisp :exports both
-  ;;   (use-package exwm
-  ;;     :init
-  ;;     (setq mouse-autoselect-window nil
-  ;;           focus-follows-mouse t
-  ;;           exwm-workspace-warp-cursor t
-  ;;           exwm-workspace-number 5)
-  ;;           ;exwm-workspace-display-echo-area-timeout 5
-  ;;           ;exwm-workspace-minibuffer-position 'bottom) ;; Annoying focus issues
-  ;;     :config
-  ;;     ;; Make class name the buffer name
-  ;;     (add-hook 'exwm-update-class-hook
-  ;;               (lambda ()
-  ;;                 (exwm-workspace-rename-buffer exwm-class-name)))
-  ;;     (add-hook 'exwm-update-title-hook
-  ;;               (lambda ()
-  ;;                 (pcase exwm-class-name
-  ;;                   ("Vimb" (exwm-workspace-rename-buffer (format "vimb: %s" exwm-title)))
-  ;;                   ("qutebrowser" (exwm-workspace-rename-buffer (format "Qutebrowser: %s" exwm-title))))))
+    (use-package exwm
+      :init
+      (setq mouse-autoselect-window nil
+            focus-follows-mouse t
+            exwm-workspace-warp-cursor t
+            exwm-workspace-number 5)
+            ;exwm-workspace-display-echo-area-timeout 5
+            ;exwm-workspace-minibuffer-position 'bottom) ;; Annoying focus issues
+      :config
+      ;; Make class name the buffer name
+      (add-hook 'exwm-update-class-hook
+                (lambda ()
+                  (exwm-workspace-rename-buffer exwm-class-name)))
+      (add-hook 'exwm-update-title-hook
+                (lambda ()
+                  (pcase exwm-class-name
+                    ("Vimb" (exwm-workspace-rename-buffer (format "vimb: %s" exwm-title)))
+                    ("qutebrowser" (exwm-workspace-rename-buffer (format "Qutebrowser: %s" exwm-title))))))
 
-  ;;     (exwm-enable))
-  ;;   (defun exwm/run-in-background (command)
-  ;;     (let ((command-parts (split-string command "[ ]+")))
-  ;;       (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+      (exwm-enable))
+    (defun exwm/run-in-background (command)
+      (let ((command-parts (split-string command "[ ]+")))
+        (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
-  ;;   (defun exwm/bind-function (key invocation &rest bindings)
-  ;;     "Bind KEYs to FUNCTIONs globally"
-  ;;     (while key
-  ;;       (exwm-input-set-key (kbd key)
-  ;;                           `(lambda ()
-  ;;                              (interactive)
-  ;;                              (funcall ',invocation)))
-  ;;       (setq key (pop bindings)
-  ;;             invocation (pop bindings))))
+    (defun exwm/bind-function (key invocation &rest bindings)
+      "Bind KEYs to FUNCTIONs globally"
+      (while key
+        (exwm-input-set-key (kbd key)
+                            `(lambda ()
+                               (interactive)
+                               (funcall ',invocation)))
+        (setq key (pop bindings)
+              invocation (pop bindings))))
 
-  ;;   (defun exwm/bind-command (key command &rest bindings)
-  ;;     "Bind KEYs to COMMANDs globally"
-  ;;     (while key
-  ;;       (exwm-input-set-key (kbd key)
-  ;;                           `(lambda ()
-  ;;                              (interactive)
-  ;;                              (exwm/run-in-background ,command)))
-  ;;       (setq key (pop bindings)
-  ;;             command (pop bindings))))
-  ;;   (defun dw/exwm-init-hook ()
-  ;;     (with-eval-after-load 'perspective
-  ;;       ;; Set up perspective names on initial workspaces
-  ;;       (exwm-workspace-switch-create 0)
-  ;;       (persp-switch "Chat")
+    (defun exwm/bind-command (key command &rest bindings)
+      "Bind KEYs to COMMANDs globally"
+      (while key
+        (exwm-input-set-key (kbd key)
+                            `(lambda ()
+                               (interactive)
+                               (exwm/run-in-background ,command)))
+        (setq key (pop bindings)
+              command (pop bindings))))
+    (defun dw/exwm-init-hook ()
+      (with-eval-after-load 'perspective
+        ;; Set up perspective names on initial workspaces
+        (exwm-workspace-switch-create 0)
+        (persp-switch "Chat")
 
-  ;;       ;; Launch Telega in workspace 0 if we've logged in before
-  ;;       (when (file-exists-p "~/.telega/db.sqlite")
-  ;;         (telega nil))
+        ;; Launch Telega in workspace 0 if we've logged in before
+        (when (file-exists-p "~/.telega/db.sqlite")
+          (telega nil))
 
-  ;;       (persp-kill "Main")
-  ;;       (exwm-workspace-switch-create 1)
-  ;;       (exwm-workspace-switch-create 2)
-  ;;       (persp-switch "Browsers")
-  ;;       (persp-kill "Main")
-  ;;       (exwm-workspace-switch-create 3)
-  ;;       (persp-switch "Comms")
-  ;;       (persp-kill "Main")
-  ;;       (exwm-workspace-switch-create 4)
-  ;;       (persp-switch "Media")
-  ;;       (persp-kill "Main")
+        (persp-kill "Main")
+        (exwm-workspace-switch-create 1)
+        (exwm-workspace-switch-create 2)
+        (persp-switch "Browsers")
+        (persp-kill "Main")
+        (exwm-workspace-switch-create 3)
+        (persp-switch "Comms")
+        (persp-kill "Main")
+        (exwm-workspace-switch-create 4)
+        (persp-switch "Media")
+        (persp-kill "Main")
 
   ;;       ;; Make workspace 1 be the one where we land at startup
-  ;;       (exwm-workspace-switch-create 1)
+        (exwm-workspace-switch-create 1)
 
   ;;       ;; Open eshell by default
   ;;       (eshell))
 
   ;;     ;; Launch apps that will run in the background
-  ;;     (exwm/run-in-background "dunst")
-  ;;     (exwm/run-in-background "flameshot")
-  ;;     (exwm/run-in-background "lxsession")
-  ;;     (exwm/run-in-background "picom")
+      (exwm/run-in-background "dunst")
+      (exwm/run-in-background "flameshot")
+      (exwm/run-in-background "lxsession")
+      (exwm/run-in-background "picom")
+(use-package exwm
+      :config
 
-  ;;   (use-package exwm
-  ;;     :config
+      (add-hook 'exwm-mode-hook
+                (lambda ()
+                  (evil-local-set-key 'motion (kbd "C-u") nil)))
 
-  ;;     (add-hook 'exwm-mode-hook
-  ;;               (lambda ()
-  ;;                 (evil-local-set-key 'motion (kbd "C-u") nil)))
+      (defun dw/setup-window-by-class ()
+        (interactive)
+        (pcase exwm-class-name
+          ("Emacs" (call-interactively #'exwm-input-toggle-keyboard))
+          ("discord" (exwm-workspace-move-window 3))
+          ("Microsoft Teams - Preview" (exwm-workspace-move-window 3))
+          ("Spotify" (exwm-workspace-move-window 4))
+          ("Vimb" (exwm-workspace-move-window 2))
+          ("qutebrowser" (exwm-workspace-move-window 2))
+          ("qjackctl" (exwm-floating-toggle-floating))
+          ("mpv" (exwm-floating-toggle-floating)
+                 (dw/exwm-floating-toggle-pinned))
+          ("gsi" (exwm-input-toggle-keyboard))))
 
-  ;;     (defun dw/setup-window-by-class ()
-  ;;       (interactive)
-  ;;       (pcase exwm-class-name
-  ;;         ("Emacs" (call-interactively #'exwm-input-toggle-keyboard))
-  ;;         ("discord" (exwm-workspace-move-window 3))
-  ;;         ("Microsoft Teams - Preview" (exwm-workspace-move-window 3))
-  ;;         ("Spotify" (exwm-workspace-move-window 4))
-  ;;         ("Vimb" (exwm-workspace-move-window 2))
-  ;;         ("qutebrowser" (exwm-workspace-move-window 2))
-  ;;         ("qjackctl" (exwm-floating-toggle-floating))
-  ;;         ("mpv" (exwm-floating-toggle-floating)
-  ;;                (dw/exwm-floating-toggle-pinned))
-  ;;         ("gsi" (exwm-input-toggle-keyboard))))
+      ;; Do some post-init setup
+      (add-hook 'exwm-init-hook #'dw/exwm-init-hook)
 
-  ;;     ;; Do some post-init setup
-  ;;     (add-hook 'exwm-init-hook #'dw/exwm-init-hook)
-
-  ;;     ;; Manipulate windows as they're created
-  ;;     (add-hook 'exwm-manage-finish-hook
-  ;;               (lambda ()
-  ;;                 ;; Send the window where it belongs
-  ;;                 (dw/setup-window-by-class)))
+      ;; Manipulate windows as they're created
+      (add-hook 'exwm-manage-finish-hook
+                (lambda ()
+                  ;; Send the window where it belongs
+                  (dw/setup-window-by-class)))
 
   ;;                 ;; Hide the modeline on all X windows
-  ;;                 ;(exwm-layout-hide-mode-line)))
+                  (exwm-layout-hide-mode-line)))
 
-  ;;     ;; Hide the modeline on all X windows
-  ;;     (add-hook 'exwm-floating-setup-hook
-  ;;               (lambda ()
-  ;;                 (exwm-layout-hide-mode-line))))
+      ;; Hide the modeline on all X windows
+      (add-hook 'exwm-floating-setup-hook
+                (lambda ()
+                  (exwm-layout-hide-mode-line))))
 
-  ;;   (use-package exwm-systemtray
-  ;;     :after (exwm)
-  ;;     :config
-  ;;     (exwm-systemtray-enable)
-  ;;     (setq exwm-systemtray-height 35))
+    (use-package exwm-systemtray :straight nil
+      :after (exwm)
+      :config
+      (exwm-systemtray-enable)
+      (setq exwm-systemtray-height 20))
 
-  ;; (setq dw/panel-process nil)
-  ;; (defun dw/kill-panel ()
-  ;;   (interactive)
-  ;;   (when dw/panel-process
-  ;;     (ignore-errors
-  ;;       (kill-process dw/panel-process)))
-  ;;   (setq dw/panel-process nil))
+  (setq dw/panel-process nil)
+  (defun dw/kill-panel ()
+    (interactive)
+    (when dw/panel-process
+      (ignore-errors
+        (kill-process dw/panel-process)))
+    (setq dw/panel-process nil))
 
-  ;; (defun dw/start-panel ()
-  ;;   (interactive)
-  ;;   (dw/kill-panel)
-  ;;   (setq dw/panel-process (start-process-shell-command "polybar" nil "polybar panel")))
+  (defun dw/start-panel ()
+    (interactive)
+    (dw/kill-panel)
+    (setq dw/panel-process (start-process-shell-command "polybar" nil "polybar panel")))
 
-  ;; (defun dw/update-screen-layout ()
-  ;;   (interactive)
-  ;;   (let ((layout-script "~/.bin/update-screens"))
-  ;;      (message "Running screen layout script: %s" layout-script)
-  ;;      (start-process-shell-command "xrandr" nil layout-script)))
+  (defun dw/update-screen-layout ()
+    (interactive)
+    (let ((layout-script "~/.bin/update-screens"))
+       (message "Running screen layout script: %s" layout-script)
+       (start-process-shell-command "xrandr" nil layout-script)))
 
-  ;; (defun dw/configure-desktop ()
-  ;;   (interactive)
-  ;;     (dw/run-xmodmap)
-  ;;     (dw/update-screen-layout)
-  ;;     (run-at-time "2 sec" nil (lambda () (dw/update-wallpapers))))
+  (defun dw/configure-desktop ()
+    (interactive)
+      (dw/run-xmodmap)
+      (dw/update-screen-layout)
+      (run-at-time "2 sec" nil (lambda () (dw/update-wallpapers))))
 
-  ;; (defun dw/on-exwm-init ()
-  ;;   (dw/configure-desktop)
-  ;;   (dw/start-panel))
+  (defun dw/on-exwm-init ()
+    (dw/configure-desktop)
+    (dw/start-panel))
 
-  ;; (defun dw/send-polybar-hook (name number)
-  ;;   (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" name number)))
+  (defun dw/send-polybar-hook (name number)
+    (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" name number)))
 
-  ;; (defun dw/update-polybar-exwm (&optional path)
-  ;;   (dw/send-polybar-hook "exwm" 1)
-  ;;   (dw/send-polybar-hook "exwm-path" 1))
+  (defun dw/update-polybar-exwm (&optional path)
+    (dw/send-polybar-hook "exwm" 1)
+    (dw/send-polybar-hook "exwm-path" 1))
 
-  ;; (defun dw/update-polybar-telegram ()
-  ;;   (dw/send-polybar-hook "telegram" 1))
+  (defun dw/update-polybar-telegram ()
+    (dw/send-polybar-hook "telegram" 1))
 
-  ;; (defun dw/polybar-exwm-workspace ()
-  ;;   (pcase exwm-workspace-current-index
-  ;;     (0 "")
-  ;;     (1 "")
-  ;;     (2 "")
-  ;;     (3 "")
-  ;;     (4 "")))
+  (defun dw/polybar-exwm-workspace ()
+    (pcase exwm-workspace-current-index
+      (0 "")
+      (1 "")
+      (2 "")
+      (3 "")
+      (4 "")))
 
-  ;; (defun dw/polybar-exwm-workspace-path ()
-  ;;   (let ((workspace-path (frame-parameter nil 'bufler-workspace-path-formatted)))
-  ;;     (if workspace-path
-  ;;         (substring-no-properties workspace-path)
-  ;;       "")))
+  (defun dw/polybar-exwm-workspace-path ()
+    (let ((workspace-path (frame-parameter nil 'bufler-workspace-path-formatted)))
+      (if workspace-path
+          (substring-no-properties workspace-path)
+        "")))
 
-  ;; (defun dw/polybar-mail-count (max-count)
-  ;;   (if (and dw/mail-enabled dw/mu4e-inbox-query)
-  ;;     (let* ((mail-count (shell-command-to-string
-  ;;                          (format "mu find --nocolor -n %s \"%s\" | wc -l" max-count dw/mu4e-inbox-query))))
-  ;;       (format " %s" (string-trim mail-count)))
-  ;;     ""))
+  (defun dw/polybar-mail-count (max-count)
+    (if (and dw/mail-enabled dw/mu4e-inbox-query)
+      (let* ((mail-count (shell-command-to-string
+                           (format "mu find --nocolor -n %s \"%s\" | wc -l" max-count dw/mu4e-inbox-query))))
+        (format " %s" (string-trim mail-count)))
+      ""))
 
-  ;; (defun dw/telega-normalize-name (chat-name)
-  ;;   (let* ((trimmed-name (string-trim-left (string-trim-right chat-name "}") "◀{"))
-  ;;          (first-name (nth 0 (split-string trimmed-name " "))))
-  ;;     first-name))
+  (defun dw/telega-normalize-name (chat-name)
+    (let* ((trimmed-name (string-trim-left (string-trim-right chat-name "}") "◀{"))
+           (first-name (nth 0 (split-string trimmed-name " "))))
+      first-name))
 
-  ;; (defun dw/propertized-to-polybar (buffer-name)
-  ;;   (if-let* ((text (substring-no-properties buffer-name))
-  ;;             (fg-face (get-text-property 0 'face buffer-name))
-  ;;             (fg-color (face-attribute fg-face :foreground)))
-  ;;     (format "%%{F%s}%s%%{F-}" fg-color (dw/telega-normalize-name text))
-  ;;     text))
+  (defun dw/propertized-to-polybar (buffer-name)
+    (if-let* ((text (substring-no-properties buffer-name))
+              (fg-face (get-text-property 0 'face buffer-name))
+              (fg-color (face-attribute fg-face :foreground)))
+      (format "%%{F%s}%s%%{F-}" fg-color (dw/telega-normalize-name text))
+      text))
 
-  ;; (defun dw/polybar-telegram-chats ()
-  ;;   (if (> (length tracking-buffers) 0)
-  ;;     (format " %s" (string-join (mapcar 'dw/propertized-to-polybar tracking-buffers) ", "))
-  ;;     ""))
+  (defun dw/polybar-telegram-chats ()
+    (if (> (length tracking-buffers) 0)
+      (format " %s" (string-join (mapcar 'dw/propertized-to-polybar tracking-buffers) ", "))
+      ""))
 
-  ;; (add-hook 'exwm-workspace-switch-hook #'dw/update-polybar-exwm)
-  ;; (add-hook 'bufler-workspace-set-hook #'dw/update-polybar-exwm)
+  (add-hook 'exwm-workspace-switch-hook #'dw/update-polybar-exwm)
+  (add-hook 'bufler-workspace-set-hook #'dw/update-polybar-exwm)
 
-  ;;     (setq exwm-input-prefix-keys
-  ;;       '(?\C-x
-  ;;         ?\C-h
-  ;;         ?\M-x
-  ;;         ?\M-`
-  ;;         ?\M-&
-  ;;         ?\M-:
-  ;;         ?\C-\M-j  ;; Buffer list
-  ;;         ?\C-\M-k  ;; Browser list
-  ;;         ?\C-\M-n  ;; Next workspace
-  ;;         ?\C-\     ;; Ctrl+Space
-  ;;         ?\C-\;))
+      (setq exwm-input-prefix-keys
+        '(?\C-x
+          ?\C-h
+          ?\M-x
+          ?\M-`
+          ?\M-&
+          ?\M-:
+          ?\C-\M-j  ;; Buffer list
+          ?\C-\M-k  ;; Browser list
+          ?\C-\M-n  ;; Next workspace
+          ?\C-\     ;; Ctrl+Space
+          ?\C-\;))
 
   ;;     ;; Ctrl+Q will enable the next key to be sent directly
   ;;     (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
-  ;;     (defun exwm/run-vimb ()
-  ;;       (exwm/run-in-background "vimb")
-  ;;       (exwm-workspace-switch-create 2))
+      (defun exwm/run-vimb ()
+        (exwm/run-in-background "vimb")
+        (exwm-workspace-switch-create 2))
 
-  ;;     (defun exwm/run-qute ()
-  ;;       (exwm/run-in-background "qutebrowser")
-  ;;       (exwm-workspace-switch-create 2))
+      (defun exwm/run-qute ()
+        (exwm/run-in-background "qutebrowser")
+        (exwm-workspace-switch-create 2))
 
-  ;;     (exwm/bind-function
-  ;;       "s-o" 'exwm/run-qute
-  ;;       "s-q" 'kill-buffer)
+      (exwm/bind-function
+        "s-o" 'exwm/run-qute
+        "s-q" 'kill-buffer)
 
-  ;;     (exwm/bind-command
-  ;;       "s-p" "playerctl play-pause"
-  ;;       "s-[" "playerctl previous"
-  ;;       "s-]" "playerctl next")
+      (exwm/bind-command
+        "s-p" "playerctl play-pause"
+        "s-[" "playerctl previous"
+        "s-]" "playerctl next")
 
-  ;;     (use-package desktop-environment
-  ;;       :after exwm
-  ;;       :config (desktop-environment-mode)
-  ;;       :custom
-  ;;       (desktop-environment-brightness-small-increment "2%+")
-  ;;       (desktop-environment-brightness-small-decrement "2%-")
-  ;;       (desktop-environment-brightness-normal-increment "5%+")
-  ;;       (desktop-environment-brightness-normal-decrement "5%-")
-  ;;       (desktop-environment-screenshot-command "flameshot gui"))
+      (use-package desktop-environment
+        :after exwm
+        :config (desktop-environment-mode)
+        :custom
+        (desktop-environment-brightness-small-increment "2%+")
+        (desktop-environment-brightness-small-decrement "2%-")
+        (desktop-environment-brightness-normal-increment "5%+")
+        (desktop-environment-brightness-normal-decrement "5%-")
+        (desktop-environment-screenshot-command "flameshot gui"))
 
-  ;;     ;; This needs a more elegant ASCII banner
-  ;;     (defhydra hydra-exwm-move-resize (:timeout 4)
-  ;;       "Move/Resize Window (Shift is bigger steps, Ctrl moves window)"
-  ;;       ("j" (lambda () (interactive) (exwm-layout-enlarge-window 10)) "V 10")
-  ;;       ("J" (lambda () (interactive) (exwm-layout-enlarge-window 30)) "V 30")
-  ;;       ("k" (lambda () (interactive) (exwm-layout-shrink-window 10)) "^ 10")
-  ;;       ("K" (lambda () (interactive) (exwm-layout-shrink-window 30)) "^ 30")
-  ;;       ("h" (lambda () (interactive) (exwm-layout-shrink-window-horizontally 10)) "< 10")
-  ;;       ("H" (lambda () (interactive) (exwm-layout-shrink-window-horizontally 30)) "< 30")
-  ;;       ("l" (lambda () (interactive) (exwm-layout-enlarge-window-horizontally 10)) "> 10")
-  ;;       ("L" (lambda () (interactive) (exwm-layout-enlarge-window-horizontally 30)) "> 30")
-  ;;       ("C-j" (lambda () (interactive) (exwm-floating-move 0 10)) "V 10")
-  ;;       ("C-S-j" (lambda () (interactive) (exwm-floating-move 0 30)) "V 30")
-  ;;       ("C-k" (lambda () (interactive) (exwm-floating-move 0 -10)) "^ 10")
-  ;;       ("C-S-k" (lambda () (interactive) (exwm-floating-move 0 -30)) "^ 30")
-  ;;       ("C-h" (lambda () (interactive) (exwm-floating-move -10 0)) "< 10")
-  ;;       ("C-S-h" (lambda () (interactive) (exwm-floating-move -30 0)) "< 30")
-  ;;       ("C-l" (lambda () (interactive) (exwm-floating-move 10 0)) "> 10")
-  ;;       ("C-S-l" (lambda () (interactive) (exwm-floating-move 30 0)) "> 30")
-  ;;       ("f" nil "finished" :exit t))
+      ;; This needs a more elegant ASCII banner
 
-  ;;     ;; Workspace switching
-  ;;     (setq exwm-input-global-keys
-  ;;            `(([?\s-\C-r] . exwm-reset)
-  ;;              ([?\s-w] . exwm-workspace-switch)
-  ;;              ([?\s-r] . hydra-exwm-move-resize/body)
-  ;;              ([?\s-e] . dired-jump)
-  ;;              ([?\s-E] . (lambda () (interactive) (dired "~")))
-  ;;              ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
-  ;;              ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
-  ;;              ,@(mapcar (lambda (i)
-  ;;                          `(,(kbd (format "s-%d" i)) .
-  ;;                             (lambda ()
-  ;;                              (interactive)
-  ;;                              (exwm-workspace-switch-create ,i))))
-  ;;                         (number-sequence 0 9))))
+      ;; Workspace switching
+      (setq exwm-input-global-keys
+             `(([?\s-\C-r] . exwm-reset)
+               ([?\s-w] . exwm-workspace-switch)
+               ([?\s-r] . hydra-exwm-move-resize/body)
+               ([?\s-e] . dired-jump)
+               ([?\s-E] . (lambda () (interactive) (dired "~")))
+               ([?\s-Q] . (lambda () (interactive) (kill-buffer)))
+               ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+               ,@(mapcar (lambda (i)
+                           `(,(kbd (format "s-%d" i)) .
+                              (lambda ()
+                               (interactive)
+                               (exwm-workspace-switch-create ,i))))
+                          (number-sequence 0 9))))
 
-  ;;     (exwm-input-set-key (kbd "<s-return>") 'multi-vterm)
-  ;;     (exwm-input-set-key (kbd "s-SPC") 'app-launcher-run-app)
-  ;;     (exwm-input-set-key (kbd "s-f") 'exwm-layout-toggle-fullscreen)
+      (exwm-input-set-key (kbd "<s-return>") 'multi-vterm)
+      (exwm-input-set-key (kbd "s-SPC") 'app-launcher-run-app)
+      (exwm-input-set-key (kbd "s-f") 'exwm-layout-toggle-fullscreen)
 
 #+end_src
-
-#+RESULTS:
-: hello
 
 ** IVY
   I tried helm but the UI was not my taste
@@ -627,7 +613,7 @@
   F1 is to open help in many apps
   Your Config is helpful
   #+begin_src emacs-lisp
-(global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
+(global-set-key (kbd "<f1>") (lambda() (interactive)(find-file "~/Config.org")))
   #+end_src
 
 ** GOTO-ADDR
@@ -695,7 +681,7 @@ This will auto generate TOC and will update TOC on save.
     )
 #+end_src
 *** ORG Auto-Tangle
-It will auto tangle on save if #+autotangle is true in the file
+It will auto tangle on save if #,autotangle is true in the file
 #+begin_src emacs-lisp
 (use-package org-auto-tangle
   :defer t
@@ -782,7 +768,7 @@ I can't switch from +doom-modeline+ Just did lol
 After using magit for a while, I can't use git cli for anythin other than adding and commiting everything.The diff feature is the killer feature imo.
   #+begin_src emacs-lisp
     (use-package magit
-      :ensure t
+      :straight t
       :defer t
       :init
       (progn
@@ -792,12 +778,12 @@ After using magit for a while, I can't use git cli for anythin other than adding
     (setq magit-status-margin
           '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
     (use-package git-gutter
-      :ensure t
+      :straight t
       :init
       (global-git-gutter-mode +1))
 
     (use-package git-timemachine
-      :ensure t
+      :straight t
       )
     (use-package diff-hl
       :config
@@ -1071,18 +1057,13 @@ Display and insert emojis in emacs
      (setq wdired-allow-to-redirect-links t)
      (setq wdired-use-interactive-rename nil)
   (use-package all-the-icons-dired
-:ensure t
+:straight t
 )
 
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 
 
    #+end_src
-
-** Telega
-#+begin_src emacs-lisp
-  (use-package telega :defer t)
-#+end_src
 
 ** Mark Multiple
 #+begin_src emacs-lisp
@@ -1178,12 +1159,13 @@ Display and insert emojis in emacs
 ** Ace window
 #+begin_src emacs-lisp
   (use-package ace-window
-    :ensure t
+    :straight t
     :init
     (progn
       (setq aw-scope 'global) ;; was frame
       (global-set-key (kbd "C-x O") 'other-frame)
-      (global-set-key [remap other-window] 'ace-window)
+      ;; (global-set-key [remap other-window] 'ace-window)
+      (ace-window-display-mode)
       ))
 #+end_src
 
@@ -1260,16 +1242,16 @@ Display and insert emojis in emacs
 
 ** EAF
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
+ (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
   (require 'eaf)
   (load "~/.emacs.d/site-lisp/emacs-application-framework/app/browser/eaf-browser.el")
   (load "~/.emacs.d/site-lisp/emacs-application-framework/app/camera/eaf-camera.el")
-  (load "~/.emacs.d/site-lisp/emacs-application-framework/app/video-player/eaf-video-player.el")
-  (load "~/.emacs.d/site-lisp/emacs-application-framework/app/pdf-viewer/eaf-pdf-viewer.el")
+ (load "~/.emacs.d/site-lisp/emacs-application-framework/app/video-player/eaf-video-player.el")
+ (load "~/.emacs.d/site-lisp/emacs-application-framework/app/pdf-viewer/eaf-pdf-viewer.el")
   (load "~/.emacs.d/site-lisp/emacs-application-framework/app/org-previewer/eaf-org-previewer.el")
-  (setq eaf-pdf-dark-mode t)
-  (setq eaf-browser-enable-scrollbar t)
-  ;; (setq eaf-browser-pc-user-agent "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36")
+ (setq eaf-pdf-dark-mode t)
+ (setq eaf-browser-enable-scrollbar t)
+  (setq eaf-browser-pc-user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36")
   (setq eaf-browser-dark-mode nil)
   (setq eaf-pdf-dark-exclude-image t)
   (defun browser ()
@@ -1371,7 +1353,7 @@ Display and insert emojis in emacs
                 (use-package company-box
                 :straight t
               :hook (company-mode . company-box-mode))
-          (use-package company-quickhelp :ensure t :after company :hook (company-mode . company-quickhelp-mode) :defer t)
+          (use-package company-quickhelp :straight t :after company :hook (company-mode . company-quickhelp-mode) :defer t)
 #+end_src
 ** Python
 #+begin_src elisp
