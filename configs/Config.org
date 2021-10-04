@@ -178,11 +178,6 @@
     (add-hook 'exwm-update-class-hook
               (lambda ()
                 (exwm-workspace-rename-buffer exwm-class-name)))
-    (add-hook 'exwm-update-title-hook
-              (lambda ()
-                (pcase exwm-class-name
-                  ("Vimb" (exwm-workspace-rename-buffer (format "vimb: %s" exwm-title)))
-                  ("qutebrowser" (exwm-workspace-rename-buffer (format "Qutebrowser: %s" exwm-title))))))
 
     (exwm-enable))
   (defun exwm/run-in-background (command)
@@ -280,11 +275,6 @@
                         `(lambda ()
                            (interactive)
                            (exwm-workspace-switch-create (1- ,i)))))
-  (defun dw/update-screen-layout ()
-    (interactive)
-    (let ((layout-script "~/.bin/update-screens"))
-      (message "Running screen layout script: %s" layout-script)
-      (start-process-shell-command "xrandr" nil layout-script)))
 
   (defun dw/configure-desktop ()
     (interactive)
@@ -293,9 +283,7 @@
     (run-at-time "2 sec" nil (lambda () (dw/update-wallpapers))))
 
   (defun dw/on-exwm-init ()
-    (dw/configure-desktop)
-    (dw/start-panel))
-
+    (dw/configure-desktop))
   (setq exwm-input-prefix-keys
         '(?\C-x
           ?\C-h
