@@ -215,6 +215,7 @@
 
           (exwm/run-in-background "dunst")
       (exwm/run-in-background "flameshot")
+      (exwm/run-in-background "schildichat-desktop --hidden")
       (exwm/run-in-background "lxsession")
       (exwm/run-in-background "picom")))
 
@@ -243,7 +244,7 @@
 
     ;;                 ;; Hide the modeline on all X windows
     (exwm-layout-hide-mode-line)
-
+(display-time)
     ;; Hide the modeline on all X windows
     (add-hook 'exwm-floating-setup-hook
             (lambda ()
@@ -358,6 +359,27 @@
           ([?\s-w] . browser)))
 #+end_src
 
+** Popper
+#+begin_src emacs-lisp
+  (use-package popper
+    :straight t ; or :straight t
+    :bind (("C-`"   . popper-toggle-latest)
+           ("M-`"   . popper-cycle)
+           ("C-M-`" . popper-toggle-type))
+    :init
+    (setq popper-reference-buffers
+          '("\\*Messages\\*"
+            "\\*rustic-compilation\\*"
+            "\\*rustfmt\\*"
+            "Output\\*$"
+            "\\*Backtrace\\*"
+            "\\*Async Shell Command\\*"
+            help-mode
+            compilation-mode))
+    (setq popper-mode-line nil)
+    (popper-mode +1)
+    (popper-echo-mode +1))                ; For echo area hints
+#+end_src
 ** IVY
   I tried helm but the UI was not my taste
   I just got used to ivy
@@ -731,14 +753,13 @@ Animations for killing, pasting etc. etc.
 ** Vterm
 My terminal of choice
   #+begin_src emacs-lisp
-    (use-package vterm :straight t :defer t)
-      (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
-                          ("find-file" find-file)
-                          ("message" message)
-                          ("vterm-clear-scrollback" vterm-clear-scrollback)))
-;; (setq  vterm-always-compile-module nil)
-(use-package multi-vterm :straight t :defer t
-    :bind ("s-<return>" . multi-vterm))
+            (use-package vterm :straight t :defer t)
+              (setq vterm-eval-cmds '(("magit-status-setup-buffer" magit-status-setup-buffer)
+                                  ("find-file" find-file)
+                                  ("message" message)
+                                  ("vterm-clear-scrollback" vterm-clear-scrollback)))
+        (use-package multi-vterm :straight t :defer t
+            :bind ("s-<return>" . multi-vterm))
 #+end_src
 
 ** Use local Emacs Instance as $EDITOR
@@ -851,12 +872,9 @@ Publish to my blog
 #+begin_src emacs-lisp
  ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
  ;;(set-frame-parameter (selected-frame) 'alpha <both>)
- (set-frame-parameter (selected-frame) 'alpha '(98 . 50))
- (add-to-list 'default-frame-alist '(alpha . (98 . 50)))
+ ;; (set-frame-parameter (selected-frame) 'alpha '(98 . 50))
+ ;; (add-to-list 'default-frame-alist '(alpha . (98 . 50)))
 #+end_src
-
-#+RESULTS:
-: ((alpha 98 . 50) (alpha 99 . 50) (alpha 95 . 50) (alpha 90 . 50) (alpha 85 . 50) (vertical-scroll-bars) (buffer-predicate . exwm-layout--other-buffer-predicate))
 
 ** Newline
 As an ex-evil user this is very useful
@@ -971,6 +989,14 @@ Display and insert emojis in emacs
 0x0.st is a very nice url shortening service i use
 #+begin_src emacs-lisp
 (use-package 0x0 :straight t :defer t)
+#+end_src
+** Perspective
+#+begin_src emacs-lisp
+;; (use-package perspective
+;;   :straight t  ; use `:straight t` if using straight.el!
+;;   :bind (("C-x k" . persp-kill-buffer*))
+;;   :init
+;;   (persp-mode))
 #+end_src
 ** Discover a mode's keybindings
 #+begin_src emacs-lisp
