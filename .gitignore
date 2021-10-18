@@ -1,4 +1,8 @@
-/emacs/.emacs.d/straight/
+/emacs/.emacs.mine/straight/
+/emacs/.emacs.mine/var
 /emacs/.emacs.d/var
-/emacs/.emacs.d/etc
-/emacs/.emacs.d/%backup%~
+/emacs/.emacs.mine/etc
+/emacs/.emacs.mine/%backup%~
+/emacs/.emacs.mine/site-lisp
+/emacs/.emacs.mine/eaf
+/emacs/.emacs.mine/data
