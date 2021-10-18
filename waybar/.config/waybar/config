@@ -57,7 +57,7 @@
 "clock": {
 "interval": 1,
 "format-alt": "{:%e %b %Y}", // Icon: calendar-alt
-"format": "{:%e %B %Y %H:%M:%S}",
+"format": "{:%e %B %Y %I:%M:%S %p}",
 "tooltip-format": "{:%e %B %Y}"
 },
 
@@ -68,12 +68,12 @@
 "warning": 70,
 "critical": 90,
 },
-"on-click": "xfce4-terminal -e 'htop'",
+"on-click": "alacritty -e 'bpytop'",
 },
 "memory": {
 "interval": 5,
 "format": " {}%", // Icon: memory
-"on-click": "xfce4-terminal -e 'htop'",
+"on-click": "alacritty -e 'bpytop'",
 "states": {
 	"warning": 70,
 	"critical": 90
@@ -86,7 +86,7 @@
 "format-ethernet": "  {ifname}: {ipaddr}/{cidr}", // Icon: ethernet
 "format-disconnected": "⚠  Disconnected",
 "tooltip-format": "{ifname}: {ipaddr}",
-"on-click": "xfce4-terminal -e 'nmtui'",
+"on-click": "alacritty -e 'nmtui'",
 },
 "network#vpn": {
     "interface": "tun0",
@@ -138,13 +138,15 @@
     	"on-scroll-up": "pamixer -ui 2",
     	"on-scroll-down": "pamixer -ud 2",
 },
-
+# https://gist.github.com/bjesus/f8db49e1434433f78e5200dc403d58a3
+# You Need to Get the python script from the above gist
 "custom/weather": {
-    	"exec": "~/.config/waybar/scripts/weather.sh chennai",
-    	"format": "{text} {icon}",
-    	"return-type": "json",
-    	"interval": 600,
-        "tooltip-format": "{tooltip}"
+    "format": "{}",
+    "tooltip": true,
+    "interval": 3600,
+    "exec": "waybar-wttr.py",
+    "return-type": "json",
+    "on-click": "alacritty -e bash ~/.local/bin/weathershow", # this is basically "curl wttr.in | less -r"  -r flag is for coloured output
 },
 
 "tray": {

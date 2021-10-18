@@ -212,4 +212,15 @@ font-size:13px;
  font-size: 13px;	
 }
 
+window#waybar {
+	    background: transparent;
+    }
+    window > box {
+ margin-top: 10px;
+ margin-left: 10px;
+ margin-right: 10px;
+ background: #404552;
+/* border-bottom: 5px solid rgba(100, 114, 125, 0.5); */
+ color: white;
+}
 

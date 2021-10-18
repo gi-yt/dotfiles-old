@@ -6,7 +6,6 @@ set $left h
 set $down j
 set $up k
 set $right l
-
 # Your preferred terminal emulators
 set $term-float alacritty
 
@@ -45,7 +44,7 @@ exec swayidle -w\
     bindsym $mod+Shift+c kill
     # Start your launcher
     bindsym $mod+d exec $menu
-
+   exec swaymsg gaps inner 15
     # Activities
     bindsym $mod+p exec ~/.config/wofi/windows.py
     bindsym $mod+z gaps inner all plus 10
@@ -116,11 +115,6 @@ exec swayidle -w\
     # Switch the current container between different layout styles
     bindsym $mod+f fullscreen
 
-    # Toggle the current focus between tiling and floating mode
-    bindsym $mod+Shift+space floating toggle
-
-    # Swap focus between the tiling area and the floating area
-    bindsym $mod+space focus mode_toggle
 #
 # Scratchpad:
 #
@@ -153,8 +147,16 @@ mode "resize" {
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
-bindsym $mod+r mode "resize"
+mode "volume" {
+    bindsym Left exec pamixer -ud 2
+    bindsym Right exec pamixer -ui 2
 
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+bindsym $mod+v mode "volume"
 # Resize floating windows with mouse scroll:
 bindsym --whole-window --border $mod+button4 resize shrink height 5 px or 5 ppt
 bindsym --whole-window --border $mod+button5 resize grow height 5 px or 5 ppt
@@ -164,8 +166,8 @@ bindsym --whole-window --border $mod+shift+button5 resize grow width 5 px or 5 p
 #
 # Volume
 #
-    bindsym --locked XF86AudioRaiseVolume exec pamixer -ui 2
-    bindsym --locked XF86AudioLowerVolume exec pamixer -ud 2
+	    bindsym --locked XF86AudioRaiseVolume exec pamixer -ui 2
+	    bindsym --locked XF86AudioLowerVolume exec pamixer -ud 2
     bindsym --locked XF86AudioMute exec pamixer -t
 #
 # Player
@@ -182,7 +184,7 @@ bindsym --whole-window --border $mod+shift+button5 resize grow width 5 px or 5 p
 #
 # Screenshots
 #
-    bindsym print exec /usr/share/sway/scripts/grimshot --notify save output
+    bindsym print exec grimshot --notify save output
     bindsym Shift+print exec ~/.config/sway/scripts/screenshot.sh
 #
 # Keybindings List
