@@ -138,15 +138,16 @@
     	"on-scroll-up": "pamixer -ui 2",
     	"on-scroll-down": "pamixer -ud 2",
 },
-# https://gist.github.com/bjesus/f8db49e1434433f78e5200dc403d58a3
-# You Need to Get the python script from the above gist
+// https://gist.github.com/bjesus/f8db49e1434433f78e5200dc403d58a3
+// You Need to Get the python script from the above gist
 "custom/weather": {
     "format": "{}",
     "tooltip": true,
     "interval": 3600,
     "exec": "waybar-wttr.py",
     "return-type": "json",
-    "on-click": "alacritty -e bash ~/.local/bin/weathershow", # this is basically "curl wttr.in | less -r"  -r flag is for coloured output
+    "on-click": "alacritty -e bash ~/.local/bin/weathershow", 
+// this is basically "curl wttr.in | less -r"  -r flag is for coloured output
 },
 
 "tray": {
