@@ -5,13 +5,13 @@
 #
 # Read `man 5 sway` for a complete reference.
 # Screen Sharing
-exec dbus-update-activation-environment DISPLAY XAUTHORITY SWAYSOCK I3SOCK WAYLAND_DISPLAY
-exec XDG_CURRENT_DESKTOP=sway /usr/libexec/xdg-desktop-portal -r
-exec /usr/libexec/xdg-desktop-portal-wlr -r
+exec /usr/lib/xdg-desktop-portal -r &
+exec  /usr/lib/xdg-desktop-portal-wlr -r &
 exec pipewire &
 # Remap Caps to BackSpace
 input "type:keyboard" {
  xkb_options caps:backspace
+ xkb_layout "us"
 }
 # user config directory
 include $HOME/.config/sway/config.d/*

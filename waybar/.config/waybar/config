@@ -146,8 +146,8 @@
     "interval": 3600,
     "exec": "waybar-wttr.py",
     "return-type": "json",
-    "on-click": "alacritty -e bash ~/.local/bin/weathershow", 
-// this is basically "curl wttr.in | less -r"  -r flag is for coloured output
+    "on-click": "alacritty -e curl wttr.in | less -r", 
+//  -r flag is for coloured output
 },
 
 "tray": {

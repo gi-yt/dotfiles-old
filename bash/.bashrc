@@ -169,7 +169,7 @@ fi
 
 eval "$(starship init bash)"
 
-source ~/.local/share/blesh/ble.sh
+source /usr/share/blesh/ble.sh
 
 alias startx="startx ~/.config/X11/xinitrc"
 

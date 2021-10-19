@@ -1,9 +1,9 @@
-ImageMagick
-Waybar
+imagemagick
+waybar
 acpi
 acpid
 alacritty
-arc-theme
+arc-gtk-theme # -eos if you are using endeavouros repos. It blends in slightly better 
 bash
 bash-completion
 bat
@@ -14,10 +14,7 @@ ccache
 cloc
 curl
 dbus
-dbus-glib
-dbus-libs
-dbus-x11
-dejavu-fonts-ttf
+ttf-dejavu
 element-desktop
 emacs
 exa
@@ -25,9 +22,9 @@ figlet
 file-roller
 firefox
 fmt
-font-awesome
-font-firacode
-font-iosevka
+ttf-font-awesome
+ttf-fira-code
+ttc-iosevka-aile
 gimp
 git
 github-cli
@@ -44,6 +41,7 @@ lxappearance
 mako
 mpv
 nodejs
+npm
 oath-toolkit
 pamixer
 pandoc
@@ -68,10 +66,10 @@ wget
 wl-clipboard
 wmctrl            
 wofi
-xdg-desktop
 xdg-desktop-portal
-xdg-desktop-portal
-xdg-user
-xdg
+xdg-desktop-portal-gtk
+xdg-desktop-portal-wlr
+xdg-user-dirs
+xdg-utils
 zenity              
 wev
