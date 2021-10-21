@@ -6,15 +6,7 @@ export VISUAL="emacsclient -c -a emacs"           # $VISUAL use Emacs in GUI mod
 ### "bat" as manpager
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-case ":${PATH}:" in
-    *:"$HOME/.cargo/bin":*)
-    ;;
-    *)
-        # Prepending path in case a system-installed rustc needs to be overridden
-        export PATH="$HOME/.cargo/bin:$PATH"
-        ;;
-esac
-
+        export PATH="$HOME/.local/share/cargo/bin:$PATH"
 ### PATH
 if [ -d "$HOME/.bin" ] ;
 then PATH="$HOME/.bin:$PATH"

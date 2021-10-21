@@ -5,9 +5,7 @@
 #
 # Read `man 5 sway` for a complete reference.
 # Screen Sharing
-exec /usr/lib/xdg-desktop-portal -r &
-exec  /usr/lib/xdg-desktop-portal-wlr -r &
-exec pipewire &
+exec systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 # Remap Caps to BackSpace
 input "type:keyboard" {
  xkb_options caps:backspace

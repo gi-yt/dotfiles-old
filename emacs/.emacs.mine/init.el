@@ -321,6 +321,7 @@
   :init
   (setq popper-reference-buffers
         '("\\*Messages\\*"
+          "\\*Warnings\\*"
           "\\*rustic-compilation\\*"
           "\\*rustfmt\\*"
           "Output\\*$"
@@ -414,7 +415,7 @@
   (forward-char 1)
   (backward-word)
   (kill-word 1))
-(global-set-key (kbd "C-c w k") 'daedreth/kill-inner-word)
+(global-set-key (kbd "C-c k w") 'daedreth/kill-inner-word)
 (defun daedreth/copy-whole-word ()
   (interactive)
   (save-excursion
@@ -422,7 +423,7 @@
     (backward-word)
     (kill-word 1)
     (yank)))
-(global-set-key (kbd "C-c w c") 'daedreth/copy-whole-word)
+(global-set-key (kbd "C-c c w") 'daedreth/copy-whole-word)
 (defun daedreth/copy-whole-line ()
   "Copies a line without regard for cursor position."
   (interactive)
@@ -431,8 +432,8 @@
      (buffer-substring
       (point-at-bol)
       (point-at-eol)))))
-(global-set-key (kbd "C-c l c") 'daedreth/copy-whole-line)
-(global-set-key (kbd "C-c l k") 'kill-whole-line)
+(global-set-key (kbd "C-c c l") 'daedreth/copy-whole-line)
+(global-set-key (kbd "C-c k l") 'kill-whole-line)
 (use-package exec-path-from-shell :straight t
   :config
   (exec-path-from-shell-initialize))

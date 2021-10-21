@@ -7,6 +7,7 @@
 (use-package lsp-mode
   :straight t
   :defer t
+  :bind-keymap ("C-c l" . lsp-command-map)
   :after (company company-box)
   :commands (lsp lsp-deferred)
   :hook (lsp-mode . efs/lsp-mode-setup)
@@ -151,7 +152,7 @@
   "Add a path both to the $PATH variable and to Emacs' exec-path."
   (setenv "PATH" (concat (getenv "PATH") ":" path))
   (add-to-list 'exec-path path))
-(use-package rustic
+(use-package rustic :after lsp
   :bind (:map rustic-mode-map
               ("M-j" . lsp-ui-imenu)
               ("M-?" . lsp-find-references)
@@ -174,7 +175,8 @@
 ;; Very minimal configuration as I usually dont use it
 (add-hook 'c-mode-hook 'lsp-deferred)
 (add-hook 'c++-mode-hook 'lsp-deferred)
-
+;; Python
+(use-package python-mode :straight nil :after lsp)
 ;;; Shell script
 (use-package company-shell :straight t
   :hook ((sh-mode shell-mode) . sh-mode-init)
