@@ -51,24 +51,24 @@
 ;;; Cool startpage
 (use-package page-break-lines)
 (use-package dashboard :after page-break-lines
-             :straight t
-             :init                                                                      ;; tweak dashboard config before loading it
-             (setq dashboard-set-heading-icons t)                                       ;; add icons for headings
-             (setq dashboard-set-file-icons t)                                          ;; add icons for files
-             (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")     ;; set a title to be displayed under the banner
-             (setq dashboard-center-content nil)                                          ;; set to 't' for centered content
-             (setq dashboard-items '((recents . 5)                                      ;; show some items on dashboard
-                                     (bookmarks . 5)
-                                     (registers . 5)))
-             (setq dashboard-page-separator "\n\f\n")    ;; <-----
-             (global-page-break-lines-mode)
-             :config
-             (dashboard-setup-startup-hook)
-             (dashboard-modify-heading-icons '((recents . "file-text")
-                                               (bookmarks . "book")))
-             :custom-face
-             (dashboard-items-face ((t (:inherit widget-button :weight normal))))
-             (dashboard-heading ((t (:inherit font-lock-keyword-face :weight semi-bold)))))
+  :straight t
+  :init                                                                      ;; tweak dashboard config before loading it
+  (setq dashboard-set-heading-icons t)                                       ;; add icons for headings
+  (setq dashboard-set-file-icons t)                                          ;; add icons for files
+  (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")     ;; set a title to be displayed under the banner
+  (setq dashboard-center-content nil)                                          ;; set to 't' for centered content
+  (setq dashboard-items '((recents . 5)                                      ;; show some items on dashboard
+                          (bookmarks . 5)
+                          (registers . 5)))
+  (setq dashboard-page-separator "\n\f\n")    ;; <-----
+  (global-page-break-lines-mode)
+  :config
+  (dashboard-setup-startup-hook)
+  (dashboard-modify-heading-icons '((recents . "file-text")
+                                    (bookmarks . "book")))
+  :custom-face
+  (dashboard-items-face ((t (:inherit widget-button :weight normal))))
+  (dashboard-heading ((t (:inherit font-lock-keyword-face :weight semi-bold)))))
 
 ;;; EAF
 ;; Do everything in emacs from browser to pdf reader to video player
