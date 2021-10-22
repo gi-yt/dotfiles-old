@@ -11,7 +11,9 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 if [ -d "$HOME/.bin" ] ;
 then PATH="$HOME/.bin:$PATH"
 fi
-
+if [ -d "$GOPATH/bin" ] ;
+then PATH="$GOPATH/bin:$PATH"
+fi
 if [ -d "$HOME/.local/bin" ] ;
 then PATH="$HOME/.local/bin:$PATH"
 fi

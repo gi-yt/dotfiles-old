@@ -229,3 +229,10 @@
 (use-package define-word)
 (straight-use-package '(apheleia :host github :repo "raxod502/apheleia"))
 (apheleia-global-mode +1)
+;;; Go Lang
+(use-package go-mode)
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+;; Start LSP Mode and YASnippet mode
+(add-hook 'go-mode-hook #'lsp-deferred)
+(add-hook 'go-mode-hook #'yas-minor-mode)

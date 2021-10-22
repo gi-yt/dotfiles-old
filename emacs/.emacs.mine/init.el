@@ -469,3 +469,6 @@
 (load "~/.emacs.mine/org.el")
 (load "~/.emacs.mine/everything.el")
 
+;;; Activity Watch
+(use-package activity-watch-mode)
+(global-activity-watch-mode)
