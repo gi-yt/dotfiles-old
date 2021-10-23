@@ -455,6 +455,8 @@
 
 (global-set-key (kbd "M-u") 'backward-word)
 (global-set-key (kbd "M-o") 'forward-word)
+(use-package general)
+(general-evil-setup t)
 (use-package rainbow-delimiters
   :straight t
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -484,5 +486,3 @@
 
   (add-to-list 'global-mode-string '("" mode-line-keycast)))
 (keycast-mode)
-(use-package general)
-(general-evil-setup t)

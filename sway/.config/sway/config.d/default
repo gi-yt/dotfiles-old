@@ -13,7 +13,11 @@ set $term-float alacritty
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
 set $menu wofi -c ~/.config/wofi/config -I
-
+for_window [app_id="^launcher$"] floating enable, sticky enable, resize set 30 ppt 60 ppt, border pixel 10
+set $run exec $term-float --class=launcher -e sway-launcher-desktop
+bindsym $mod+d exec $run
+for_window [app_id="dmenu"] floating enable, sticky enable, resize set 30 ppt 60 ppt, border pixel 10
+bindsym $mod+c exec wl-clipboard-manager dmenu
 set $powermenu ~/.config/waybar/scripts/power-menu.sh
 
 ### Idle configuration
@@ -42,8 +46,6 @@ exec swayidle -w\
     # Kill focused window
     bindsym $mod+q kill
     bindsym $mod+Shift+c kill
-    # Start your launcher
-    bindsym $mod+d exec $menu
    exec swaymsg gaps inner 15
     # Activities
     bindsym $mod+p exec ~/.config/wofi/windows.py
